@@ -14,15 +14,22 @@
  * limitations under the License.
  */
 
-import {createGraphRunner, GraphRunner, WasmModule} from './mediapipe/web/graph_runner/graph_runner';
-import {createMediaPipeAudioBlendshapes, MediaPipeAudioBlendshapes} from './mediapipe_audio_blendshapes';
+import {
+  createGraphRunner,
+  GraphRunner,
+  WasmModule,
+} from "./mediapipe/web/graph_runner/graph_runner";
+import {
+  createMediaPipeAudioBlendshapes,
+  MediaPipeAudioBlendshapes,
+} from "./mediapipe_audio_blendshapes";
 // import {trustedResourceUrl} from 'safevalues';
 
 // Create FPS text renderer observer here.
-const messageTag = document.getElementById('message') as HTMLCanvasElement;
+const messageTag = document.getElementById("message") as HTMLCanvasElement;
 const fpsRenderer = {
   process(mspf: number) {
-    let detectionString = '';
+    let detectionString = "";
     if (mspf && mspf > 0.0) {
       detectionString += `  Processing: ${mspf.toFixed(2)} ms`;
     }
@@ -44,7 +51,7 @@ function renderLoop() {
   const start = performance.now();
   wasmLib.finishProcessing();
   fpsRenderer.process(performance.now() - start);
-  requestAnimationFrame(evt => {
+  requestAnimationFrame((evt) => {
     renderLoop();
   });
 }
@@ -53,20 +60,21 @@ function renderLoop() {
 // data packet input is set up similarly to the above renderLoop.
 function blendshapeLoop(audioBlendshapes: MediaPipeAudioBlendshapes) {
   const blendshapes = audioBlendshapes.getBlendshapes();
-  console.log('Blendshapes: ', blendshapes);
+  console.log("Blendshapes: ", blendshapes);
   // Poll 3-4 times a second
   setTimeout(() => {
     blendshapeLoop(audioBlendshapes);
   }, 300);
 }
 
-const NUM_SAMPLES = 1024;   // 1024
-const SAMPLE_RATE = 44100;  // Was 44100, but internally is 16000
+const NUM_SAMPLES = 1024; // 1024
+const SAMPLE_RATE = 44100; // Was 44100, but internally is 16000
 
 // For demo, stream microphone data into MediaPipe graph
 // tslint:disable-next-line:no-unused-variable
-function streamMicrophoneThroughGraph(wasmLib: GraphRunner|
-                                      MediaPipeAudioBlendshapes) {
+function streamMicrophoneThroughGraph(
+  wasmLib: GraphRunner | MediaPipeAudioBlendshapes
+) {
   const onAcquiredUserMedia = (stream: MediaStream) => {
     if (wasmLib instanceof MediaPipeAudioBlendshapes) {
       blendshapeLoop(wasmLib);
@@ -85,7 +93,7 @@ function streamMicrophoneThroughGraph(wasmLib: GraphRunner|
     // to the deprecation warning. TODO(tmullen): Fix
     // tslint:disable:deprecation
     let lastAudioTimestamp = 0.0;
-    processor.onaudioprocess = e => {
+    processor.onaudioprocess = (e) => {
       // Only pick up the first channel's data, as a Float32Array
       const audioData = e.inputBuffer.getChannelData(0);
       wasmModule.NUM_QUEUED_AUDIO_PACKETS++;
@@ -94,31 +102,42 @@ function streamMicrophoneThroughGraph(wasmLib: GraphRunner|
       // at the desired sample rate with no breaks.
       // TODO(tmullen): Figure out why e.playbackTime now breaks things, and how
       //     best to fix.
-      const timestamp = lastAudioTimestamp + NUM_SAMPLES * 1000.0 / SAMPLE_RATE;
+      const timestamp =
+        lastAudioTimestamp + (NUM_SAMPLES * 1000.0) / SAMPLE_RATE;
       if (timestamp > lastAudioTimestamp) {
-        wasmLib.addAudioToStream(audioData, 'input_audio', timestamp);
+        wasmLib.addAudioToStream(audioData, "input_audio", timestamp);
       }
       lastAudioTimestamp = timestamp;
     };
     // tslint:enable:deprecation
   };
-  navigator.mediaDevices.getUserMedia({audio: true, video: false})
-      .then(onAcquiredUserMedia);
+  navigator.mediaDevices
+    .getUserMedia({ audio: true, video: false })
+    .then(onAcquiredUserMedia);
 }
 
-export let audioBlendshapes: MediaPipeAudioBlendshapes|null = null;
+export let audioBlendshapes: MediaPipeAudioBlendshapes | null = null;
 
 // tslint:disable-next-line:no-unused-variable
 export async function runBlendshapesDemo(isV2: boolean) {
   if (audioBlendshapes === null) {
     audioBlendshapes = await createMediaPipeAudioBlendshapes(
-        isV2?'talking_head_v2/talking_heads_v2_blendshapes_internal.js': 'talking_head_v1/talking_heads_blendshapes_internal.js',
-        isV2?'talking_head_v2/talking_heads_v2_microphone_assets.js':'talking_head_v1/talking_heads_microphone_assets.js');
-    wasmModule =
-        audioBlendshapes.wasmModule as WasmModule & TalkingHeadsWasmModule;
+      isV2
+        ? "talking_head_v2/talking_heads_v2_blendshapes_internal.js"
+        : "talking_head_v1/talking_heads_blendshapes_internal.js",
+      isV2
+        ? "talking_head_v2/talking_heads_v2_microphone_assets.js"
+        : "talking_head_v1/talking_heads_microphone_assets.js"
+    );
+    wasmModule = audioBlendshapes.wasmModule as WasmModule &
+      TalkingHeadsWasmModule;
     wasmModule.NUM_QUEUED_AUDIO_PACKETS = 0;
     audioBlendshapes.configureAudio(1, NUM_SAMPLES, SAMPLE_RATE);
-    await audioBlendshapes.initializeGraph(isV2?'talking_head_v2/talking_heads_v2_demo.binarypb':'talking_head_v1/talking_heads_demo.binarypb');
+    await audioBlendshapes.initializeGraph(
+      isV2
+        ? "talking_head_v2/talking_heads_v2_demo.binarypb"
+        : "talking_head_v1/talking_heads_demo.binarypb"
+    );
     // streamMicrophoneThroughGraph(audioBlendshapes);
   }
 }
@@ -143,9 +162,9 @@ export function registerCallback(audioData: Float32Array) {
   // at the desired sample rate with no breaks.
   // TODO(tmullen): Figure out why e.playbackTime now breaks things, and how
   //     best to fix.
-  const timestamp = lastAudioT + NUM_SAMPLES * 1000.0 / SAMPLE_RATE;
+  const timestamp = lastAudioT + (NUM_SAMPLES * 1000.0) / SAMPLE_RATE;
   if (timestamp > lastAudioT) {
-    audioBlendshapes.addAudioToStream(audioData, 'input_audio', timestamp);
+    audioBlendshapes.addAudioToStream(audioData, "input_audio", timestamp);
   }
   lastAudioT = timestamp;
 }
@@ -161,4 +180,4 @@ export default {
   registerCallback,
   audioBlendshapes,
   lastAudioT,
-}
+};

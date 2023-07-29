@@ -112,6 +112,7 @@ const useTextToSpeech = () => {
     if (!text) {
       return { audioContent: new Uint8Array(0) };
     }
+
     let cloudTtsVoice = await getDefaultVoice();
     if (voice.cloudTtsVoice) {
       cloudTtsVoice = voice.cloudTtsVoice;
@@ -125,6 +126,7 @@ const useTextToSpeech = () => {
       cloudTtsPitch = voice.cloudTtsPitch;
     }
     let response: SynthesizeResponse;
+
     response = await sendRequestToGoogleCloudApi(
       "https://texttospeech.googleapis.com/v1/text:synthesize",
       {
@@ -220,13 +222,17 @@ const useTextToSpeech = () => {
   const convert = async (text: string) => {
     // console.log('Lamda response: ', text);
     // Use default voice for demo
+
     const voice = getDefaultAvatarVoice();
+    // console.log(voice);
+    // console.log(text);
+
     if (!text || (!voice?.cloudTtsVoice && !voice?.winslow)) {
       return;
     }
-    await synthesize(text, voice).then((synthesizeResult) =>
-      play(synthesizeResult.audioContent, voice)
-    );
+    await synthesize(text, voice).then((synthesizeResult) => {
+      play(synthesizeResult.audioContent, voice);
+    });
   };
 
   return {
