@@ -14,49 +14,52 @@
  * limitations under the License.
  */
 
-import React, {useState} from 'react';
+import React, { useState } from "react";
 
-const useAvatarImage =
-    () => {
-      const [storedImage, setStoredImage] =
-          useState(localStorage.getItem('imageUrl') ?? '');
+const useAvatarImage = () => {
+  const [storedImage, setStoredImage] = useState(
+    localStorage.getItem("imageUrl") ?? ""
+  );
 
-      const handleUploadImage =
-          async (event: React.ChangeEvent<HTMLInputElement>) => {
-        const selectedFile = event.target.files?.[0];
-        if (selectedFile) {
-          const reader = new FileReader();
-          reader.readAsDataURL(selectedFile);
-          reader.onload = () => {
-            const imageUrl = reader.result as string;
-            localStorage.setItem(
-                'previousUrl', localStorage.getItem('imageUrl') ?? '');
-            localStorage.setItem(
-                'imageUrl', imageUrl);  // Store image URL in localStorage
-            setStoredImage(imageUrl);
-          };
-        }
+  const handleUploadImage = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const selectedFile = event.target.files?.[0];
+    if (selectedFile) {
+      const reader = new FileReader();
+      reader.readAsDataURL(selectedFile);
+      reader.onload = () => {
+        const imageUrl = reader.result as string;
+        localStorage.setItem(
+          "previousUrl",
+          localStorage.getItem("imageUrl") ?? ""
+        );
+        localStorage.setItem("imageUrl", imageUrl); // Store image URL in localStorage
+        setStoredImage(imageUrl);
       };
-
-      const handleCancelUploadImage =
-          () => {
-            const previousUrl = localStorage.getItem('previousUrl');
-            if (previousUrl !== null && previousUrl !== undefined) {
-              localStorage.setItem('imageUrl', previousUrl);
-              setStoredImage(previousUrl);
-              localStorage.removeItem('previousUrl');
-            }
-          }
-
-      const finishAvatarChange =
-          () => {
-            localStorage.removeItem('previousUrl');
-          }
-
-      return {
-        storedImage, setStoredImage, handleUploadImage, handleCancelUploadImage,
-            finishAvatarChange,
-      }
     }
+  };
+
+  const handleCancelUploadImage = () => {
+    const previousUrl = localStorage.getItem("previousUrl");
+    if (previousUrl !== null && previousUrl !== undefined) {
+      localStorage.setItem("imageUrl", previousUrl);
+      setStoredImage(previousUrl);
+      localStorage.removeItem("previousUrl");
+    }
+  };
+
+  const finishAvatarChange = () => {
+    localStorage.removeItem("previousUrl");
+  };
+
+  return {
+    storedImage,
+    setStoredImage,
+    handleUploadImage,
+    handleCancelUploadImage,
+    finishAvatarChange,
+  };
+};
 
 export default useAvatarImage;
