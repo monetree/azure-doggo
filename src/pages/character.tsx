@@ -254,9 +254,7 @@ const Character: React.FC = () => {
             boxSizing: "content-box",
             overflow: "hidden",
           }}
-        >
-          <Typography>{transcript[0]}</Typography>
-        </Box>
+        ></Box>
 
         <Box
           component="div"

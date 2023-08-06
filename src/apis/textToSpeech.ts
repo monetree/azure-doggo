@@ -137,8 +137,10 @@ const useTextToSpeech = () => {
         },
         input: { text },
         voice: {
-          languageCode: cloudTtsVoice.languageCode,
-          name: cloudTtsVoice.name,
+          // languageCode: cloudTtsVoice.languageCode,
+          // name: cloudTtsVoice.name,
+          languageCode: "hi-IN",
+          name: "hi-IN-Standard-B",
         },
       },
       GOOGLE_CLOUD_API_KEY

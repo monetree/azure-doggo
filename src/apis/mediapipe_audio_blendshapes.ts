@@ -14,7 +14,11 @@
  * limitations under the License.
  */
 
-import {createMediaPipeLib, GraphRunner, WasmModule} from './mediapipe/web/graph_runner/graph_runner';
+import {
+  createMediaPipeLib,
+  GraphRunner,
+  WasmModule,
+} from "./mediapipe/web/graph_runner/graph_runner";
 
 declare interface AudioBlendshapesWasmModule {
   updateBlendshape: (name: string, value: number) => void;
@@ -29,10 +33,12 @@ export class MediaPipeAudioBlendshapes extends GraphRunner {
 
   constructor(module: WasmModule) {
     super(module);
-    (module as unknown as AudioBlendshapesWasmModule).updateBlendshape =
-        (name: string, value: number) => {
-          this.blendshapes[name] = value;
-        };
+    (module as unknown as AudioBlendshapesWasmModule).updateBlendshape = (
+      name: string,
+      value: number
+    ) => {
+      this.blendshapes[name] = value;
+    };
   }
 
   /**
@@ -57,9 +63,13 @@ export class MediaPipeAudioBlendshapes extends GraphRunner {
  *     completed successfully.
  */
 export async function createMediaPipeAudioBlendshapes(
-    wasmLoaderScript: string,
-    assetLoaderScript: string): Promise<MediaPipeAudioBlendshapes> {
+  wasmLoaderScript: string,
+  assetLoaderScript: string
+): Promise<MediaPipeAudioBlendshapes> {
   return createMediaPipeLib(
-      MediaPipeAudioBlendshapes, wasmLoaderScript, assetLoaderScript,
-      undefined /* glCanvas */);
+    MediaPipeAudioBlendshapes,
+    wasmLoaderScript,
+    assetLoaderScript,
+    undefined /* glCanvas */
+  );
 }

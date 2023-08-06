@@ -21,4 +21,4 @@ export const LANGUAGE_MODEL_API_KEY = ""; // Fill in your API key
 export const LANGUAGE_MODEL_BASE_URL =
   "https://autopush-generativelanguage.sandbox.googleapis.com";
 
-export const LANGUAGE_MODEL_URL = `${LANGUAGE_MODEL_BASE_URL}/v1beta1/models/chat-bison-001:generateMessage?key=${LANGUAGE_MODEL_API_KEY}`;
+export const LANGUAGE_MODEL_URL = `https://api.openai.com/v1/chat/completions`;

@@ -47,7 +47,7 @@ function updateBlendshapes(
   if (!node.morphTargetInfluences) {
     return;
   }
-  // console.log(blendshapes)
+  console.log(blendshapes, "+++++++++++");
   // console.log(node.morphTargetDictionary)
   for (const name in blendshapes) {
     const value = blendshapes[name];

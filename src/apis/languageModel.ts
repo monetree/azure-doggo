@@ -54,9 +54,7 @@ export interface ExampleProps {
  * represent the prompt's messages.
  */
 export interface PromptProps {
-  context?: string;
-  examples?: ExampleProps[];
-  messages: MessageProps[];
+  context?: any;
 }
 
 /**
@@ -82,25 +80,19 @@ const useLanguageModel = (): LanguageModel => {
   let context = "";
   let messages: MessageProps[] = [];
 
-  const sendPrompt = async (
-    prompt: PromptProps,
-    temperature: number
-  ): Promise<SendPromptResponse> => {
-    const payload = {
-      prompt: { ...prompt },
-      temperature,
-      candidate_count: 1,
-    };
-
+  const sendPrompt = async (payload: any) => {
+    var myHeaders = new Headers();
+    myHeaders.append(
+      "Authorization",
+      "Bearer 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"
+    );
+    myHeaders.append("Content-Type", "application/json");
     const response = await fetch(LANGUAGE_MODEL_URL, {
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: myHeaders,
       body: JSON.stringify(payload),
       method: "POST",
     });
-
-    return response.json() as Promise<SendPromptResponse>;
+    return response.json();
   };
 
   useEffect(() => {
@@ -108,17 +100,22 @@ const useLanguageModel = (): LanguageModel => {
   }, [config]);
 
   const sendMessage = async (message: string): Promise<string> => {
-    const content = `Please answer within 100 characters. {${message}}. The response must be based on the personality, backstory, and knowledge base that you have. The answer must be concise and short.`;
-
-    const prompt: PromptProps = {
-      context: context,
-      messages: messages.concat([{ author: "0", content }]),
+    const payload = {
+      model: "gpt-3.5-turbo",
+      messages: [
+        {
+          role: "system",
+          content: "You are a virtual teacher. Answer question in 20 words.",
+        },
+        {
+          role: "user",
+          content: message,
+        },
+      ],
     };
 
-    // const response = await sendPrompt(prompt, 0.25);
-    // messages = response.messages.concat(response.candidates[0]);
-
-    return "Shah Rukh Khan also known by the initialism SRK, is an Indian actor and film producer who works in Hindi films. Referred to in the media as the Baadshah of Bollywood and King Khan,[a] he has appeared in more than 90 films, and earned numerous accolades, including 14 Filmfare Awards. He has been awarded the Padma Shri by the Government of India, as well as the Ordre des Arts et des Lettres and Legion of Honour by the Government of France. Khan has a significant following in Asia and the Indian diaspora worldwide. In terms of audience size and income, several media outlets have described him as one of the most successful film stars in the world.[b] Many of his films thematise Indian national identity and connections with diaspora communities, or gender, racial, social and religious differences and grievances.";
+    const response = await sendPrompt(payload);
+    return response.choices[0].message.content;
   };
 
   return {
