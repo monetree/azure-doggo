@@ -61,7 +61,7 @@ function updateBlendshapes(
 export function Doggo(props: JSX.IntrinsicElements["group"]) {
   const group = useRef<THREE.Group>();
   const { nodes, materials, animations } = useGLTF(
-    "/Doggo07.glb"
+    "https://baby-staging-bucket.s3.us-east-2.amazonaws.com/avatars/Doggo07.glb"
   ) as GLTFResult;
   const { ref, actions } = useAnimations(animations, group);
   const keyactionsStoped = useRef<boolean>(false);
@@ -112,4 +112,6 @@ export function Doggo(props: JSX.IntrinsicElements["group"]) {
     </group>
   );
 }
-useGLTF.preload("/Doggo07.glb");
+useGLTF.preload(
+  "https://baby-staging-bucket.s3.us-east-2.amazonaws.com/avatars/Doggo07.glb"
+);
