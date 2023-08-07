@@ -127,6 +127,7 @@ const useTextToSpeech = () => {
     }
     let response: SynthesizeResponse;
 
+    const language = sessionStorage.getItem("voice") || null;
     response = await sendRequestToGoogleCloudApi(
       "https://texttospeech.googleapis.com/v1/text:synthesize",
       {
@@ -139,8 +140,10 @@ const useTextToSpeech = () => {
         voice: {
           // languageCode: cloudTtsVoice.languageCode,
           // name: cloudTtsVoice.name,
-          languageCode: "hi-IN",
-          name: "hi-IN-Standard-B",
+          languageCode: language
+            ? JSON.parse(language)["languageCodes"][0]
+            : "es-US",
+          name: language ? JSON.parse(language).name : "es-US-Standard-B",
         },
       },
       GOOGLE_CLOUD_API_KEY

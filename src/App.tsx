@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-import React from 'react';
-import './App.css';
+import React from "react";
+import "./App.css";
 
-import {  BrowserRouter } from 'react-router-dom';
-import { Router } from './routes';
+import { BrowserRouter } from "react-router-dom";
+import { Router } from "./routes";
 
 /**  App  */
 export function App() {
@@ -28,4 +28,3 @@ export function App() {
     </BrowserRouter>
   );
 }
-

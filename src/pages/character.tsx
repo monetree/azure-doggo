@@ -159,6 +159,59 @@ const Character: React.FC = () => {
     ),
   };
 
+  const Voices = [
+    {
+      languageCodes: ["en-US"],
+      name: "en-US-Standard-A",
+      ssmlGender: "FEMALE",
+      naturalSampleRateHertz: 24000,
+      code: "English-Female",
+    },
+    {
+      languageCodes: ["en-US"],
+      name: "en-US-Standard-B",
+      ssmlGender: "MALE",
+      naturalSampleRateHertz: 24000,
+      code: "English-Male",
+    },
+    {
+      languageCodes: ["hi-IN"],
+      name: "hi-IN-Wavenet-A",
+      ssmlGender: "FEMALE",
+      naturalSampleRateHertz: 24000,
+      code: "Hindi-Female",
+    },
+    {
+      languageCodes: ["hi-IN"],
+      name: "hi-IN-Wavenet-B",
+      ssmlGender: "MALE",
+      naturalSampleRateHertz: 24000,
+      code: "Hindi-Male",
+    },
+    {
+      languageCodes: ["te-IN"],
+      name: "te-IN-Standard-A",
+      ssmlGender: "FEMALE",
+      naturalSampleRateHertz: 24000,
+      code: "Telugu-Female",
+    },
+    {
+      languageCodes: ["te-IN"],
+      name: "te-IN-Standard-B",
+      ssmlGender: "MALE",
+      naturalSampleRateHertz: 24000,
+      code: "Telugu-Male",
+    },
+  ];
+
+  const setVoice = (voice: any) => {
+    for (let i of Voices) {
+      if (i.code === voice) {
+        sessionStorage.setItem("voice", JSON.stringify(i));
+      }
+    }
+  };
+
   return (
     <Box
       component="div"
@@ -177,7 +230,23 @@ const Character: React.FC = () => {
         elevation={0}
         sx={{ width: boxWidth, alignSelf: "center" }}
       >
-        <Toolbar className="tool-bar">
+        <select
+          style={{
+            outline: "none",
+            padding: "10px",
+            borderRadius: "5px",
+            margin: "20px",
+            border: "2px solid #E4D00A",
+          }}
+          onChange={(e) => {
+            setVoice(e.target.value);
+          }}
+        >
+          {Voices.map((voice, index) => (
+            <option key={index}>{voice.code}</option>
+          ))}
+        </select>
+        {/* <Toolbar className="tool-bar">
           <Box
             component="div"
             className="shadow-back-button"
@@ -192,7 +261,7 @@ const Character: React.FC = () => {
               />
             </IconButton>
           </Box>
-        </Toolbar>
+        </Toolbar> */}
       </AppBar>
 
       <Box

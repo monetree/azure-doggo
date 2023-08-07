@@ -174,6 +174,8 @@ const useSpeechRecognition = () => {
   }, [characterState, bars, analyser]);
 
   const recognize = async (audioString: string) => {
+    const voice = sessionStorage.getItem("voice") || null;
+
     await sendRequestToGoogleCloudApi(
       "https://speech.googleapis.com/v1p1beta1/speech:recognize",
       {
@@ -182,7 +184,7 @@ const useSpeechRecognition = () => {
           sampleRateHertz: 48000,
           audioChannelCount: 1,
           enableAutomaticPunctuation: true,
-          languageCode: "hi-IN",
+          languageCode: voice ? JSON.parse(voice)["languageCodes"][0] : "es-US",
           profanityFilter: true,
         },
         audio: { content: audioString },

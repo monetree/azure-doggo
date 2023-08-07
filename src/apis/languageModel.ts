@@ -105,7 +105,7 @@ const useLanguageModel = (): LanguageModel => {
       messages: [
         {
           role: "system",
-          content: "You are a virtual teacher. Answer question in 20 words.",
+          content: "You are a virtual teacher. Answer question in 50 words.",
         },
         {
           role: "user",
