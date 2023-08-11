@@ -142,8 +142,8 @@ const useTextToSpeech = () => {
           // name: cloudTtsVoice.name,
           languageCode: language
             ? JSON.parse(language)["languageCodes"][0]
-            : "es-US",
-          name: language ? JSON.parse(language).name : "es-US-Standard-B",
+            : "en-US",
+          name: language ? JSON.parse(language).name : "en-US-Standard-B",
         },
       },
       GOOGLE_CLOUD_API_KEY

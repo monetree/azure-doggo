@@ -184,7 +184,7 @@ const useSpeechRecognition = () => {
           sampleRateHertz: 48000,
           audioChannelCount: 1,
           enableAutomaticPunctuation: true,
-          languageCode: voice ? JSON.parse(voice)["languageCodes"][0] : "es-US",
+          languageCode: voice ? JSON.parse(voice)["languageCodes"][0] : "en-US",
           profanityFilter: true,
         },
         audio: { content: audioString },
