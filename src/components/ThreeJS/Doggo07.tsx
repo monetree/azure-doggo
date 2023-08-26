@@ -68,6 +68,7 @@ export function Doggo(props: JSX.IntrinsicElements["group"]) {
     setInterval(() => {
       if (talkingHead.audioBlendshapes === null) return;
       const blendShapesMapping = talkingHead.audioBlendshapes!.getBlendshapes();
+      console.log("blendShapesMapping in Doggo", blendShapesMapping);
       if (!keyactionsStoped.current && talkingHead.lastAudioT > 0.0) {
         actions.KeyAction!.stop();
         keyactionsStoped.current = true;
