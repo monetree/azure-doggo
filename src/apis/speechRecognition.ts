@@ -214,6 +214,8 @@ const useSpeechRecognition = () => {
     setCharacterState,
     onMicButtonPressed,
     setOnSpeechFoundCallback,
+    startRecording,
+    stopRecording,
   };
 };
 

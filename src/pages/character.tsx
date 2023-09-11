@@ -41,6 +41,13 @@ import { Canvas } from "@react-three/fiber";
 import * as talkingHead from "../apis/talkingHead";
 import { Doggo } from "../components/ThreeJS/Doggo07";
 import { ZEPETO_TORSO_3 } from "../components/ThreeJS/ZEPETO_TORSO_3";
+import ResponsiveAppBar from "../components/Layout/Header";
+import ResponsiveGrid from "../components/Layout/Footer";
+import { ThemeProvider, createTheme } from "@mui/material/styles";
+import InputLabel from "@mui/material/InputLabel";
+import MenuItem from "@mui/material/MenuItem";
+import FormControl from "@mui/material/FormControl";
+import Select, { SelectChangeEvent } from "@mui/material/Select";
 
 const useZepetoModel = false;
 
@@ -59,30 +66,6 @@ const Character: React.FC = () => {
   const [transcript, setTranscript] = useState<String[]>(["You", ""]);
   const { boxWidth } = useStyle();
   talkingHead.runBlendshapesDemo(useZepetoModel);
-
-  useEffect(() => {
-    setOnProcessCallback((audioData: Float32Array) => {
-      talkingHead.registerCallback(audioData);
-    });
-    setOnSpeechFoundCallback((transcription: string) => {
-      setTranscript(["You", transcription]);
-      sendMessage(transcription).then((result) => {
-        setTranscript(["Buddy", result]);
-        convert(result).then(() => {
-          setCharacterState(CharacterState.Idle);
-        });
-      });
-    });
-  }, []);
-
-  const handleCustomizeButtonClick = () => {
-    if (characterState == CharacterState.Idle) {
-      navigate("/personality");
-    }
-  };
-
-  const isIFrame = (input: HTMLElement | null): input is HTMLIFrameElement =>
-    input !== null && input.tagName === "IFRAME";
 
   const characterStateIcon = {
     [CharacterState.Idle]: (
@@ -202,6 +185,20 @@ const Character: React.FC = () => {
       naturalSampleRateHertz: 24000,
       code: "Telugu-Male",
     },
+    {
+      languageCodes: ["bn-IN"],
+      name: "bn-IN-Standard-A",
+      ssmlGender: "FEMALE",
+      naturalSampleRateHertz: 24000,
+      code: "Bangla-Female",
+    },
+    {
+      languageCodes: ["fil-PH"],
+      name: "fil-PH-Standard-A",
+      ssmlGender: "FEMALE",
+      naturalSampleRateHertz: 24000,
+      code: "Philippines-Female",
+    },
   ];
 
   const setVoice = (voice: any) => {
@@ -212,41 +209,56 @@ const Character: React.FC = () => {
     }
   };
 
+  const darkTheme = createTheme({
+    palette: {
+      mode: "dark",
+      primary: {
+        main: "#1976d2",
+      },
+    },
+  });
+
+  // Usage
+
   return (
-    <Box
-      component="div"
-      sx={{
-        display: "flex",
-        flexDirection: "column",
-        minHeight: "100vh",
-        paddingLeft: "5vh",
-        paddingRight: "5vh",
-        bgcolor: COLORS.bgcolor,
-      }}
-    >
-      <AppBar
-        position="static"
-        color="transparent"
-        elevation={0}
-        sx={{ width: boxWidth, alignSelf: "center" }}
+    <ThemeProvider theme={darkTheme}>
+      <ResponsiveAppBar />
+      <Box
+        component="div"
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          minHeight: "100vh",
+          paddingLeft: "5vh",
+          paddingRight: "5vh",
+          bgcolor: COLORS.bgcolor,
+        }}
       >
-        <select
-          style={{
-            outline: "none",
-            padding: "10px",
-            borderRadius: "5px",
-            margin: "20px",
-            border: "2px solid #E4D00A",
-          }}
-          onChange={(e) => {
-            setVoice(e.target.value);
-          }}
+        <AppBar
+          position="static"
+          color="transparent"
+          elevation={0}
+          sx={{ width: boxWidth, alignSelf: "center" }}
         >
-          {Voices.map((voice, index) => (
-            <option key={index}>{voice.code}</option>
-          ))}
-        </select>
-        {/* <Toolbar className="tool-bar">
+          <Box sx={{ minWidth: 120, marginTop: 2, marginBottom: 2 }}>
+            <FormControl fullWidth>
+              <InputLabel id="demo-simple-select-label">Language</InputLabel>
+              <Select
+                labelId="demo-simple-select-label"
+                id="demo-simple-select"
+                label="Age"
+                onChange={(e) => setVoice(e.target.value)}
+              >
+                {Voices.map((voice, index) => (
+                  <MenuItem value={voice.code} key={index}>
+                    {voice.code}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Box>
+
+          {/* <Toolbar className="tool-bar">
           <Box
             component="div"
             className="shadow-back-button"
@@ -262,140 +274,150 @@ const Character: React.FC = () => {
             </IconButton>
           </Box>
         </Toolbar> */}
-      </AppBar>
-
-      <Box
-        component="div"
-        sx={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          textAlign: "center",
-          flexDirection: "column",
-          position: "relative",
-        }}
-      >
-        <Box
-          component="div"
-          className="shadow-box"
-          sx={{
-            width: boxWidth,
-            height: "40vh",
-            boxSizing: "border-box",
-            overflow: "hidden",
-            margin: "0 0 2vh 0",
-            bgcolor: "#FFFFFF",
-          }}
-        >
-          {storedImage === "" || storedImage === null ? (
-            useZepetoModel ? (
-              <Canvas
-                camera={{ fov: 45, rotation: [0, 0, 0], position: [0, 0, 15] }}
-              >
-                <pointLight position={[0, 0, 10]} intensity={0.03} />
-                <ambientLight intensity={1} />
-                <ZEPETO_TORSO_3></ZEPETO_TORSO_3>
-              </Canvas>
-            ) : (
-              <Canvas
-                camera={{ fov: 45, rotation: [0, 0, 0], position: [0, 0, 10] }}
-                style={{ backgroundColor: "#FAD972" }}
-              >
-                <pointLight position={[0, 0, 10]} intensity={0.03} />
-                <Doggo></Doggo>
-              </Canvas>
-            )
-          ) : (
-            <CardMedia
-              id="talkingHeadIframe"
-              component="img"
-              image={storedImage}
-              alt="Uploaded Image"
-            />
-          )}
-        </Box>
+        </AppBar>
 
         <Box
           component="div"
           sx={{
-            width: boxWidth,
-            textAlign: "left",
-            boxSizing: "content-box",
-            overflow: "hidden",
-          }}
-        ></Box>
-
-        <Box
-          component="div"
-          className="shadow-box"
-          sx={{
-            width: boxWidth,
-            height: "15vh",
-            verticalAlign: "middle",
-            boxSizing: "content-box",
-            margin: "2vh 0",
-            bgcolor: "#FFFFFF",
-          }}
-        >
-          <Typography
-            style={{ color: COLORS.primary }}
-            sx={{
-              padding: "0.8vh",
-              margin: "1.2vh",
-              textAlign: "left",
-              height: "11vh",
-              overflow: "scroll",
-              "&::-webkit-scrollbar": {
-                width: "1.5px",
-                height: "0",
-              },
-              "&::-webkit-scrollbar-thumb": {
-                background: "#AAA",
-                borderRadius: "0.7px",
-              },
-              borderRadius: "4vh",
-              fontFamily: "Google Sans, sans-serif",
-              fontSize: "14px",
-            }}
-          >
-            {transcript[1]}
-          </Typography>
-        </Box>
-
-        <Box
-          component="div"
-          sx={{
+            display: "flex",
             justifyContent: "center",
-            paddingTop: "2vh",
-            transform: "translate(15px, -30px)",
+            alignItems: "center",
+            textAlign: "center",
+            flexDirection: "column",
+            position: "relative",
           }}
         >
-          {characterStateIcon[characterState]}
           <Box
             component="div"
-            className={`bar-container ${
-              characterState != CharacterState.Listening ? "hidden" : ""
-            }`}
+            className="shadow-box"
+            sx={{
+              width: boxWidth,
+              height: "40vh",
+              boxSizing: "border-box",
+              overflow: "hidden",
+              margin: "0 0 2vh 0",
+              bgcolor: "#FFFFFF",
+            }}
           >
-            <Box
-              component="div"
-              ref={(el: HTMLDivElement | null) => (bars.current[0] = el)}
-              className="bar"
-            />
-            <Box
-              component="div"
-              ref={(el: HTMLDivElement | null) => (bars.current[1] = el)}
-              className="bar middle"
-            />
-            <Box
-              component="div"
-              ref={(el: HTMLDivElement | null) => (bars.current[2] = el)}
-              className="bar"
-            />
+            {storedImage === "" || storedImage === null ? (
+              useZepetoModel ? (
+                <Canvas
+                  camera={{
+                    fov: 45,
+                    rotation: [0, 0, 0],
+                    position: [0, 0, 15],
+                  }}
+                >
+                  <pointLight position={[0, 0, 10]} intensity={0.03} />
+                  <ambientLight intensity={1} />
+                  <ZEPETO_TORSO_3></ZEPETO_TORSO_3>
+                </Canvas>
+              ) : (
+                <Canvas
+                  camera={{
+                    fov: 45,
+                    rotation: [0, 0, 0],
+                    position: [0, 0, 10],
+                  }}
+                  style={{ backgroundColor: "#FAD972" }}
+                >
+                  <pointLight position={[0, 0, 10]} intensity={0.03} />
+                  <Doggo></Doggo>
+                </Canvas>
+              )
+            ) : (
+              <CardMedia
+                id="talkingHeadIframe"
+                component="img"
+                image={storedImage}
+                alt="Uploaded Image"
+              />
+            )}
           </Box>
+
+          <Box
+            component="div"
+            sx={{
+              width: boxWidth,
+              textAlign: "left",
+              boxSizing: "content-box",
+              overflow: "hidden",
+            }}
+          ></Box>
+
+          {/* <Box
+            component="div"
+            className="shadow-box"
+            sx={{
+              width: boxWidth,
+              height: "15vh",
+              verticalAlign: "middle",
+              boxSizing: "content-box",
+              margin: "2vh 0",
+              bgcolor: "#FFFFFF",
+            }}
+          >
+            <Typography
+              style={{ color: COLORS.primary }}
+              sx={{
+                padding: "0.8vh",
+                margin: "1.2vh",
+                textAlign: "left",
+                height: "11vh",
+                overflow: "scroll",
+                "&::-webkit-scrollbar": {
+                  width: "1.5px",
+                  height: "0",
+                },
+                "&::-webkit-scrollbar-thumb": {
+                  background: "#AAA",
+                  borderRadius: "0.7px",
+                },
+                borderRadius: "4vh",
+                fontFamily: "Google Sans, sans-serif",
+                fontSize: "14px",
+              }}
+            >
+              {transcript[1]}
+            </Typography>
+          </Box> */}
+
+          {/* <Box
+            component="div"
+            sx={{
+              justifyContent: "center",
+              paddingTop: "2vh",
+              transform: "translate(15px, -30px)",
+            }}
+          >
+            {characterStateIcon[characterState]}
+            <Box
+              component="div"
+              className={`bar-container ${
+                characterState != CharacterState.Listening ? "hidden" : ""
+              }`}
+            >
+              <Box
+                component="div"
+                ref={(el: HTMLDivElement | null) => (bars.current[0] = el)}
+                className="bar"
+              />
+              <Box
+                component="div"
+                ref={(el: HTMLDivElement | null) => (bars.current[1] = el)}
+                className="bar middle"
+              />
+              <Box
+                component="div"
+                ref={(el: HTMLDivElement | null) => (bars.current[2] = el)}
+                className="bar"
+              />
+            </Box>
+          </Box> */}
         </Box>
+        <ResponsiveGrid />
       </Box>
-    </Box>
+    </ThemeProvider>
   );
 };
 

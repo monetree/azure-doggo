@@ -17,7 +17,10 @@
 import { useContext, useEffect } from "react";
 
 import { ConfigContext } from "../context/config";
-import { LANGUAGE_MODEL_URL } from "../context/constants";
+import {
+  LANGUAGE_MODEL_API_KEY,
+  LANGUAGE_MODEL_URL,
+} from "../context/constants";
 
 /**
  * Represents a message object with an author and content.
@@ -82,10 +85,7 @@ const useLanguageModel = (): LanguageModel => {
 
   const sendPrompt = async (payload: any) => {
     var myHeaders = new Headers();
-    myHeaders.append(
-      "Authorization",
-      "Bearer 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"
-    );
+    myHeaders.append("Authorization", `Bearer ${LANGUAGE_MODEL_API_KEY}`);
     myHeaders.append("Content-Type", "application/json");
     const response = await fetch(LANGUAGE_MODEL_URL, {
       headers: myHeaders,

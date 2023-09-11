@@ -60,7 +60,7 @@ function renderLoop() {
 // data packet input is set up similarly to the above renderLoop.
 function blendshapeLoop(audioBlendshapes: MediaPipeAudioBlendshapes) {
   const blendshapes = audioBlendshapes.getBlendshapes();
-  console.log("Blendshapes In talking head: ", blendshapes);
+  // console.log("Blendshapes In talking head: ", blendshapes);
   // Poll 3-4 times a second
   setTimeout(() => {
     blendshapeLoop(audioBlendshapes);

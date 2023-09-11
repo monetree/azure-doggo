@@ -16,7 +16,8 @@
 
 export const GOOGLE_CLOUD_API_KEY = "AIzaSyDFpK8EXyWLN2PY0hqIPa6Z2KLadkciVlE"; // Fill in your API key
 
-export const LANGUAGE_MODEL_API_KEY = ""; // Fill in your API key
+export const LANGUAGE_MODEL_API_KEY =
+  "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"; // Fill in your API key
 
 export const LANGUAGE_MODEL_BASE_URL =
   "https://autopush-generativelanguage.sandbox.googleapis.com";

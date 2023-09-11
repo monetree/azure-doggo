@@ -60,7 +60,7 @@ function updateBlendshapes(
 export function Doggo(props: JSX.IntrinsicElements["group"]) {
   const group = useRef<THREE.Group>();
   const { nodes, materials, animations } = useGLTF(
-    "https://baby-staging-bucket.s3.us-east-2.amazonaws.com/avatars/Doggo07.glb"
+    "/Doggo07.glb"
   ) as GLTFResult;
   const { ref, actions } = useAnimations(animations, group);
   const keyactionsStoped = useRef<boolean>(false);
@@ -68,7 +68,7 @@ export function Doggo(props: JSX.IntrinsicElements["group"]) {
     setInterval(() => {
       if (talkingHead.audioBlendshapes === null) return;
       const blendShapesMapping = talkingHead.audioBlendshapes!.getBlendshapes();
-      console.log("blendShapesMapping in Doggo", blendShapesMapping);
+      // console.log("blendShapesMapping in Doggo", blendShapesMapping);
       if (!keyactionsStoped.current && talkingHead.lastAudioT > 0.0) {
         actions.KeyAction!.stop();
         keyactionsStoped.current = true;
@@ -112,6 +112,4 @@ export function Doggo(props: JSX.IntrinsicElements["group"]) {
     </group>
   );
 }
-useGLTF.preload(
-  "https://baby-staging-bucket.s3.us-east-2.amazonaws.com/avatars/Doggo07.glb"
-);
+useGLTF.preload("/Doggo07.glb");

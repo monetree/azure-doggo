@@ -14,37 +14,37 @@
  * limitations under the License.
  */
 
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from "react";
 
 export const COLORS = {
-      primary: '#669DF6',
-      grey: '#99A2AF',
-      bgcolor: '#F2F5F8',
+  primary: "#669DF6",
+  grey: "#99A2AF",
+  // bgcolor: "#494a50",
+  bgcolor: "#1b1d23",
+};
+
+const useStyle = () => {
+  const [boxWidth, setBoxWidth] = useState("40vh");
+
+  useEffect(() => {
+    const calculateWidth = () => {
+      const vh = window.innerHeight * 0.01;
+      const vw = window.innerWidth * 0.01;
+
+      if (40 * vh > 100 * vw) {
+        setBoxWidth("80vw");
+      } else {
+        setBoxWidth("40vh");
+      }
     };
 
-const useStyle = 
-  () => {
-    const [boxWidth, setBoxWidth] = useState('40vh');
-   
-    useEffect(() => {
-      const calculateWidth = () => {
-        const vh = window.innerHeight * 0.01;
-        const vw = window.innerWidth * 0.01;
+    window.addEventListener("resize", calculateWidth);
+    calculateWidth();
 
-        if (40 * vh > 100 * vw) {
-          setBoxWidth('80vw');
-        } else {
-          setBoxWidth('40vh');
-        }
-      };
+    return () => window.removeEventListener("resize", calculateWidth);
+  }, [boxWidth]);
 
-      window.addEventListener('resize', calculateWidth);
-      calculateWidth();
-
-      return () => window.removeEventListener('resize', calculateWidth);
-    }, [boxWidth]);
-
-    return {boxWidth}
-}
+  return { boxWidth };
+};
 
 export default useStyle;
