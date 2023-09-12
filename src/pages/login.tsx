@@ -1,103 +1,3 @@
-// import Card from "@mui/material/Card";
-// import CardContent from "@mui/material/CardContent";
-// import Typography from "@mui/material/Typography";
-// import { CardActionArea } from "@mui/material";
-// import { useGoogleLogin } from "@react-oauth/google";
-// import axios from "axios";
-// import { useEffect, useState } from "react";
-// import Grid from "@mui/material/Grid";
-// import GoogleButton from "react-google-button";
-
-// export default function Login() {
-//   const [user, setUser] = useState([]);
-//   const [emails, setEmails] = useState([]);
-
-//   const login = useGoogleLogin({
-//     onSuccess: (codeResponse: any) => setUser(codeResponse.access_token),
-//     onError: (error: any) => console.log("Login Failed:", error),
-//   });
-
-//   const getEmails = () => {
-//     axios
-//       .get(`https://api.polyverse.app/api/whitelisted-emails/`, {
-//         headers: {
-//           Accept: "application/json",
-//         },
-//       })
-//       .then((res) => {
-//         let emails = res.data;
-//         setEmails(emails);
-//       })
-//       .catch((err) => console.log(err));
-//   };
-
-//   useEffect(() => {
-//     getEmails();
-//   }, []);
-
-//   useEffect(() => {
-//     if (user) {
-//       axios
-//         .get(
-//           `https://www.googleapis.com/oauth2/v1/userinfo?access_token=${user}`,
-//           {
-//             headers: {
-//               Authorization: `Bearer ${user}`,
-//               Accept: "application/json",
-//             },
-//           }
-//         )
-//         .then((res) => {
-//           for (let i of emails) {
-//             if (i.email === res.data.email) {
-//               console.log("***google Info**", res.data);
-
-//               localStorage.setItem("id", i.id);
-//               localStorage.setItem("role", i.role);
-//               localStorage.setItem("organization", i.organization);
-//               localStorage.setItem("user_name", i.name);
-//               localStorage.setItem("user_type", i.user_type);
-
-//               localStorage.setItem("email", res.data.email);
-//               localStorage.setItem("name", res.data.name);
-//               localStorage.setItem("userInfo", JSON.stringify(res.data));
-//               window.location.href = "/";
-//               return;
-//             }
-//           }
-//         })
-//         .catch((err) => console.log(err));
-//     }
-//   }, [user]);
-
-//   return (
-//     <div
-//       style={{
-//         margin: "auto",
-//         display: "flex",
-//         justifyContent: "center",
-//         textAlign: "center",
-//         alignItems: "center",
-//       }}
-//     >
-//       <Card sx={{ minWidth: 445 }}>
-//         <CardActionArea>
-//           <CardContent>
-//             <Typography gutterBottom variant="h5" component="div">
-//               Please Login to access
-//             </Typography>
-//             <Typography variant="body2" color="text.secondary">
-//               <p style={{ textAlign: "center", marginLeft: "2rem" }}>
-//                 <GoogleButton onClick={() => login()} />
-//               </p>
-//             </Typography>
-//           </CardContent>
-//         </CardActionArea>
-//       </Card>
-//     </div>
-//   );
-// }
-
 import * as React from "react";
 import Avatar from "@mui/material/Avatar";
 import Button from "@mui/material/Button";
@@ -142,6 +42,9 @@ const defaultTheme = createTheme();
 export default function Login() {
   const [user, setUser] = useState([]);
   const [emails, setEmails] = useState([]);
+
+  const search = window.location.search;
+  const params = new URLSearchParams(search);
 
   const login = useGoogleLogin({
     onSuccess: (codeResponse: any) => setUser(codeResponse.access_token),
@@ -210,10 +113,33 @@ export default function Login() {
     });
   };
 
+  const validateToken = (token: string, email: string) => {
+    axios
+      .post(`https://api.polyverse.app/api/verify-token/`, {
+        token: token,
+        email: email,
+      })
+      .then((res) => {
+        let data = res.data;
+        localStorage.setItem("id", data.id);
+        localStorage.setItem("email", data.email);
+        window.location.href = "/talk";
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
   useEffect(() => {
     const user = localStorage.getItem("id");
+    const token = params.get("token");
+    const email = params.get("email");
     if (user) {
       window.location.href = "/talk";
+    } else {
+      if (token && email) {
+        validateToken(token, email);
+      }
     }
   }, []);
 

@@ -1,5 +1,5 @@
 import { AppBar, Box, CardMedia } from "@mui/material";
-import React from "react";
+import React, { useEffect } from "react";
 import useAvatarImage from "../apis/avatarImage";
 import useStyle, { COLORS } from "./styles";
 import { Canvas } from "@react-three/fiber";
@@ -93,7 +93,12 @@ const Character: React.FC = () => {
     },
   });
 
-  // Usage
+  useEffect(() => {
+    const user = localStorage.getItem("id");
+    if (!user) {
+      window.location.href = "/";
+    }
+  }, []);
 
   return (
     <ThemeProvider theme={darkTheme}>
