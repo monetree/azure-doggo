@@ -1,44 +1,8 @@
-/**
- * Copyright 2023 Google LLC
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
-import {
-  KeyboardVoiceOutlined,
-  MicOffOutlined,
-  Pause,
-  SettingsOutlined,
-} from "@mui/icons-material";
-import {
-  AppBar,
-  Box,
-  CardMedia,
-  IconButton,
-  Toolbar,
-  Typography,
-} from "@mui/material";
-import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { AppBar, Box, CardMedia } from "@mui/material";
+import React from "react";
 import useAvatarImage from "../apis/avatarImage";
-import useLanguageModel from "../apis/languageModel";
-import useSpeechRecognition, {
-  CharacterState,
-} from "../apis/speechRecognition";
-import useTextToSpeech from "../apis/textToSpeech";
 import useStyle, { COLORS } from "./styles";
 import { Canvas } from "@react-three/fiber";
-import * as talkingHead from "../apis/talkingHead";
 import { Doggo } from "../components/ThreeJS/Doggo07";
 import { ZEPETO_TORSO_3 } from "../components/ThreeJS/ZEPETO_TORSO_3";
 import ResponsiveAppBar from "../components/Layout/Header";
@@ -47,100 +11,11 @@ import { ThemeProvider, createTheme } from "@mui/material/styles";
 import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
-import Select, { SelectChangeEvent } from "@mui/material/Select";
-
-const useZepetoModel = false;
+import Select from "@mui/material/Select";
 
 const Character: React.FC = () => {
-  const navigate = useNavigate();
-  const { sendMessage } = useLanguageModel();
-  const {
-    characterState,
-    bars,
-    setCharacterState,
-    onMicButtonPressed,
-    setOnSpeechFoundCallback,
-  } = useSpeechRecognition();
-  const { convert, setOnProcessCallback } = useTextToSpeech();
   const { storedImage } = useAvatarImage();
-  const [transcript, setTranscript] = useState<String[]>(["You", ""]);
   const { boxWidth } = useStyle();
-  talkingHead.runBlendshapesDemo(useZepetoModel);
-
-  const characterStateIcon = {
-    [CharacterState.Idle]: (
-      <IconButton
-        className="shadow-box"
-        onClick={onMicButtonPressed}
-        aria-label="Start Recording"
-        sx={{
-          width: "10vh",
-          height: "10vh",
-          marginTop: "30px",
-          padding: "16px",
-          borderRadius: "50%",
-          color: COLORS.primary,
-          backgroundColor: COLORS.bgcolor,
-          "&:hover": {
-            backgroundColor: COLORS.bgcolor,
-            "@media (hover: none)": {
-              backgroundColor: COLORS.bgcolor,
-            },
-          },
-        }}
-      >
-        <KeyboardVoiceOutlined sx={{ fontSize: "40px" }} />
-      </IconButton>
-    ),
-    [CharacterState.Listening]: (
-      <IconButton
-        className="shadow-box"
-        onClick={onMicButtonPressed}
-        color="error"
-        aria-label="Stop Recording"
-        sx={{
-          width: "10vh",
-          height: "10vh",
-          marginTop: "30px",
-          padding: "16px",
-          borderRadius: "50%",
-          backgroundColor: COLORS.bgcolor,
-          "&:hover": {
-            backgroundColor: COLORS.bgcolor,
-            "@media (hover: none)": {
-              backgroundColor: COLORS.bgcolor,
-            },
-          },
-        }}
-      >
-        <Pause sx={{ fontSize: "40px" }} />
-      </IconButton>
-    ),
-    [CharacterState.Speaking]: (
-      <IconButton
-        className="shadow-box"
-        onClick={onMicButtonPressed}
-        color="default"
-        aria-label="Recording Disabled"
-        sx={{
-          width: "10vh",
-          height: "10vh",
-          marginTop: "30px",
-          padding: "16px",
-          borderRadius: "50%",
-          backgroundColor: "grey.400",
-          "&:hover": {
-            backgroundColor: "grey.500",
-            "@media (hover: none)": {
-              backgroundColor: "grey.400",
-            },
-          },
-        }}
-      >
-        <MicOffOutlined sx={{ fontSize: "40px" }} />
-      </IconButton>
-    ),
-  };
 
   const Voices = [
     {
@@ -220,13 +95,6 @@ const Character: React.FC = () => {
 
   // Usage
 
-  useEffect(() => {
-    const user = localStorage.getItem("id");
-    if (!user) {
-      window.location.href = "/login";
-    }
-  }, []);
-
   return (
     <ThemeProvider theme={darkTheme}>
       <ResponsiveAppBar />
@@ -264,23 +132,6 @@ const Character: React.FC = () => {
               </Select>
             </FormControl>
           </Box>
-
-          {/* <Toolbar className="tool-bar">
-          <Box
-            component="div"
-            className="shadow-back-button"
-            sx={{ justifyContent: "center", color: COLORS.bgcolor }}
-          >
-            <IconButton
-              onClick={handleCustomizeButtonClick}
-              aria-label="fullscreen"
-            >
-              <SettingsOutlined
-                sx={{ fontSize: "3vh", color: COLORS.primary }}
-              />
-            </IconButton>
-          </Box>
-        </Toolbar> */}
         </AppBar>
 
         <Box
@@ -306,40 +157,17 @@ const Character: React.FC = () => {
               bgcolor: "#FFFFFF",
             }}
           >
-            {storedImage === "" || storedImage === null ? (
-              useZepetoModel ? (
-                <Canvas
-                  camera={{
-                    fov: 45,
-                    rotation: [0, 0, 0],
-                    position: [0, 0, 15],
-                  }}
-                >
-                  <pointLight position={[0, 0, 10]} intensity={0.03} />
-                  <ambientLight intensity={1} />
-                  <ZEPETO_TORSO_3></ZEPETO_TORSO_3>
-                </Canvas>
-              ) : (
-                <Canvas
-                  camera={{
-                    fov: 45,
-                    rotation: [0, 0, 0],
-                    position: [0, 0, 10],
-                  }}
-                  style={{ backgroundColor: "#FAD972" }}
-                >
-                  <pointLight position={[0, 0, 10]} intensity={0.03} />
-                  <Doggo></Doggo>
-                </Canvas>
-              )
-            ) : (
-              <CardMedia
-                id="talkingHeadIframe"
-                component="img"
-                image={storedImage}
-                alt="Uploaded Image"
-              />
-            )}
+            <Canvas
+              camera={{
+                fov: 45,
+                rotation: [0, 0, 0],
+                position: [0, 0, 10],
+              }}
+              style={{ backgroundColor: "#FAD972" }}
+            >
+              <pointLight position={[0, 0, 10]} intensity={0.03} />
+              <Doggo></Doggo>
+            </Canvas>
           </Box>
 
           <Box
