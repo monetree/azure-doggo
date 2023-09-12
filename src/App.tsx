@@ -19,12 +19,15 @@ import "./App.css";
 
 import { BrowserRouter } from "react-router-dom";
 import { Router } from "./routes";
+import { GoogleOAuthProvider } from "@react-oauth/google";
 
 /**  App  */
 export function App() {
   return (
     <BrowserRouter>
-      <Router />
+      <GoogleOAuthProvider clientId="118420081966-s1n42272jcg4r5l4erufahti23ubp8o0.apps.googleusercontent.com">
+        <Router />
+      </GoogleOAuthProvider>
     </BrowserRouter>
   );
 }

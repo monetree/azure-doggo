@@ -220,6 +220,13 @@ const Character: React.FC = () => {
 
   // Usage
 
+  useEffect(() => {
+    const user = localStorage.getItem("id");
+    if (!user) {
+      window.location.href = "/login";
+    }
+  }, []);
+
   return (
     <ThemeProvider theme={darkTheme}>
       <ResponsiveAppBar />

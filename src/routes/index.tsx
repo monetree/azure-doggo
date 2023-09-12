@@ -18,17 +18,22 @@ import React from "react";
 import { useRoutes } from "react-router-dom";
 import Character from "../pages/character";
 import Personality from "../pages/personality";
+import Login from "../pages/login";
 
 /** Router */
 export function Router() {
   return useRoutes([
     {
-      path: "/",
+      path: "/talk",
       element: <Character />,
     },
     {
       path: "/personality",
       element: <Personality />,
+    },
+    {
+      path: "/",
+      element: <Login />,
     },
   ]);
 }
