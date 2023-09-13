@@ -46,13 +46,24 @@ const useSpeechRecognition = () => {
   const onSpeechFoundCallback = useRef<SpeechFoundCallback>((text) => {});
   const audioContext = useRef<AudioContext | null>(null);
   const analyser = useRef<AnalyserNode | null>(null);
-  const stream = useRef<MediaStream | null>(null);
+  let stream = useRef<MediaStream | null>(null);
   const source = useRef<MediaStreamAudioSourceNode | null>(null);
   const bars = useRef<(HTMLDivElement | null)[]>([]);
 
   const setOnSpeechFoundCallback = (callback: SpeechFoundCallback) => {
     onSpeechFoundCallback.current = callback;
   };
+
+  (async () => {
+    try {
+      stream.current = await navigator.mediaDevices.getUserMedia({
+        audio: true,
+      });
+      // ... other setup code here
+    } catch (err) {
+      console.error("Error accessing media devices.", err);
+    }
+  })();
 
   const startRecording = async () => {
     try {

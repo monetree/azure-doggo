@@ -102,7 +102,7 @@ const Character: React.FC = () => {
     if (!user) {
       window.location.href = "/";
     } else {
-      turnAudio();
+      // turnAudio();
     }
   }, []);
 
