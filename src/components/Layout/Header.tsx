@@ -131,7 +131,7 @@ function ResponsiveAppBar() {
                 textDecoration: "none",
               }}
             >
-              LOGO
+              AvatarX
             </Typography>
             <Box className="navs">
               {pages.map((page) => (

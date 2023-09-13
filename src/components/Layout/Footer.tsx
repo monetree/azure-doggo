@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import useTextToSpeech from "../../apis/textToSpeech";
 import * as talkingHead from "../../apis/talkingHead";
 import TextField from "@mui/material/TextField";
+import TranscriptModalDialog from "./transcriptModal";
 
 interface ChildComponentProps {
   transcript: string;
@@ -29,6 +30,7 @@ const ResponsiveGrid = () => {
   talkingHead.runBlendshapesDemo(useZepetoModel);
   const [transcript, setTranscript] = useState<String[]>(["You", ""]);
   const [inputValue, setInputValue] = useState("");
+  const [open, setOpen] = useState(false);
 
   const handleChange = (event: any) => {
     setInputValue(event.target.value);
@@ -98,7 +100,7 @@ const ResponsiveGrid = () => {
           width: "56px",
           border: "1px solid #fff",
           marginRight: "20px",
-          marginLeft: "30px",
+          marginLeft: "20px",
           cursor: "pointer",
         }}
         onClick={startRecording}
@@ -126,7 +128,7 @@ const ResponsiveGrid = () => {
           width: "56px",
           border: "1px solid #fff",
           marginRight: "10px",
-          marginLeft: "30px",
+          marginLeft: "20px",
           cursor: "pointer",
         }}
         onClick={stopRecording}
@@ -158,7 +160,7 @@ const ResponsiveGrid = () => {
           width: "56px",
           border: "1px solid #fff",
           marginRight: "10px",
-          marginLeft: "30px",
+          marginLeft: "20px",
           cursor: "pointer",
         }}
         onClick={stopRecording}
@@ -246,7 +248,7 @@ const ResponsiveGrid = () => {
           alignItems: "center",
           bottom: "45px",
           display: "flex",
-          left: "26px",
+          left: "15px",
           position: "absolute",
         }}
       >
@@ -343,6 +345,7 @@ const ResponsiveGrid = () => {
             marginRight: "20px",
             cursor: "pointer",
           }}
+          onClick={() => setOpen(true)}
         >
           <span className="mat-button-wrapper">
             <svg
@@ -373,6 +376,12 @@ const ResponsiveGrid = () => {
           </form>
         </div>
       </div>
+      <TranscriptModalDialog
+        open={open}
+        setOpen={setOpen}
+        user={"Hello"}
+        avatar={"Hi"}
+      />
     </div>
   );
 };
