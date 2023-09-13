@@ -246,7 +246,7 @@ const ResponsiveGrid = () => {
         className={"action-wrapper action-btns"}
         style={{
           alignItems: "center",
-          bottom: "45px",
+          bottom: "20px",
           display: "flex",
           left: "15px",
           position: "absolute",

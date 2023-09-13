@@ -31,6 +31,12 @@ export enum CharacterState {
   Speaking,
 }
 
+declare global {
+  interface Window {
+    webkitAudioContext: typeof AudioContext;
+  }
+}
+
 const useSpeechRecognition = () => {
   const [characterState, setCharacterState] = useState<CharacterState>(
     CharacterState.Idle
@@ -53,7 +59,10 @@ const useSpeechRecognition = () => {
       stream.current = await navigator.mediaDevices.getUserMedia({
         audio: true,
       });
-      audioContext.current = new AudioContext();
+
+      audioContext.current = new (window.AudioContext ||
+        window.webkitAudioContext)();
+
       analyser.current = audioContext.current.createAnalyser();
       source.current = audioContext.current.createMediaStreamSource(
         stream.current
