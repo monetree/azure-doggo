@@ -103,7 +103,7 @@ const ResponsiveGrid = () => {
           marginLeft: "20px",
           cursor: "pointer",
         }}
-        onClick={startRecording}
+        onClick={onMicButtonPressed}
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -131,20 +131,19 @@ const ResponsiveGrid = () => {
           marginLeft: "20px",
           cursor: "pointer",
         }}
-        onClick={stopRecording}
+        onClick={onMicButtonPressed}
       >
-        <span className="mat-button-wrapper">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 16 16"
-            width="24"
-            height="24"
-            fill="#3C3C3C"
-          >
-            <path d="M5 3a3 3 0 0 1 6 0v5a3 3 0 0 1-6 0V3z"></path>
-            <path d="M3.5 6.5A.5.5 0 0 1 4 7v1a4 4 0 0 0 8 0V7a.5.5 0 0 1 1 0v1a5 5 0 0 1-4.5 4.975V15h3a.5.5 0 0 1 0 1h-7a.5.5 0 0 1 0-1h3v-2.025A5 5 0 0 1 3 8V7a.5.5 0 0 1 .5-.5z"></path>
-          </svg>
-        </span>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 16 16"
+          width="24"
+          height="24"
+          fill="#3C3C3C"
+        >
+          <path d="M5 3a3 3 0 0 1 6 0v5a3 3 0 0 1-6 0V3z"></path>
+          <path d="M3.5 6.5A.5.5 0 0 1 4 7v1a4 4 0 0 0 8 0V7a.5.5 0 0 1 1 0v1a5 5 0 0 1-4.5 4.975V15h3a.5.5 0 0 1 0 1h-7a.5.5 0 0 1 0-1h3v-2.025A5 5 0 0 1 3 8V7a.5.5 0 0 1 .5-.5z"></path>
+        </svg>
+        <span className="mat-button-wrapper"></span>
         <span className="mat-ripple mat-button-ripple mat-button-ripple-round"></span>
         <span className="mat-button-focus-overlay"></span>
       </button>
@@ -158,12 +157,12 @@ const ResponsiveGrid = () => {
           borderRadius: "50%",
           height: "56px",
           width: "56px",
-          border: "1px solid #fff",
+          border: "1px solid #eee",
           marginRight: "10px",
           marginLeft: "20px",
           cursor: "pointer",
         }}
-        onClick={stopRecording}
+        disabled
       >
         <span className="mat-button-wrapper">
           <svg
@@ -171,10 +170,9 @@ const ResponsiveGrid = () => {
             viewBox="0 0 16 16"
             width="24"
             height="24"
-            fill="#3C3C3C"
+            fill="currentColor"
           >
-            <path d="M5 3a3 3 0 0 1 6 0v5a3 3 0 0 1-6 0V3z"></path>
-            <path d="M3.5 6.5A.5.5 0 0 1 4 7v1a4 4 0 0 0 8 0V7a.5.5 0 0 1 1 0v1a5 5 0 0 1-4.5 4.975V15h3a.5.5 0 0 1 0 1h-7a.5.5 0 0 1 0-1h3v-2.025A5 5 0 0 1 3 8V7a.5.5 0 0 1 .5-.5z"></path>
+            <path d="M6.717 3.55A.5.5 0 0 1 7 4v8a.5.5 0 0 1-.812.39L3.825 10.5H1.5A.5.5 0 0 1 1 10V6a.5.5 0 0 1 .5-.5h2.325l2.363-1.89a.5.5 0 0 1 .529-.06zm7.137 2.096a.5.5 0 0 1 0 .708L12.207 8l1.647 1.646a.5.5 0 0 1-.708.708L11.5 8.707l-1.646 1.647a.5.5 0 0 1-.708-.708L10.793 8 9.146 6.354a.5.5 0 1 1 .708-.708L11.5 7.293l1.646-1.647a.5.5 0 0 1 .708 0z"></path>
           </svg>
         </span>
         <span className="mat-ripple mat-button-ripple mat-button-ripple-round"></span>
