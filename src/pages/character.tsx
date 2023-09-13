@@ -93,10 +93,16 @@ const Character: React.FC = () => {
     },
   });
 
+  const turnAudio = async () => {
+    await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
+  };
+
   useEffect(() => {
     const user = localStorage.getItem("id");
     if (!user) {
       window.location.href = "/";
+    } else {
+      turnAudio();
     }
   }, []);
 
