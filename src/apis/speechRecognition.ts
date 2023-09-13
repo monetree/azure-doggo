@@ -56,9 +56,9 @@ const useSpeechRecognition = () => {
 
   const startRecording = async () => {
     try {
-      stream.current = await navigator.mediaDevices.getUserMedia({
-        audio: true,
-      });
+      // stream.current = await navigator.mediaDevices.getUserMedia({
+      //   audio: true,
+      // });
 
       audioContext.current = new AudioContext();
       analyser.current = audioContext.current.createAnalyser();
