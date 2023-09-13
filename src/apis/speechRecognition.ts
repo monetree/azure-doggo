@@ -119,7 +119,6 @@ const useSpeechRecognition = () => {
       reader.readAsDataURL(blob);
       reader.onloadend = async () => {
         const base64Data = reader.result?.toString().split(",")[1];
-        alert(base64Data);
         if (base64Data) {
           setCharacterState(CharacterState.Speaking);
           await recognize(base64Data);
