@@ -60,9 +60,7 @@ const useSpeechRecognition = () => {
         audio: true,
       });
 
-      audioContext.current = new (window.AudioContext ||
-        window.webkitAudioContext)();
-
+      audioContext.current = new AudioContext();
       analyser.current = audioContext.current.createAnalyser();
       source.current = audioContext.current.createMediaStreamSource(
         stream.current
