@@ -31,9 +31,9 @@
   align-items: center;
 }
 
-.action-btns button {
+/* .action-btns button {
   border-radius: 50%;
-}
+} */
 
 .action-btns button.microphone.mat-focus-indicator {
   border: 1px solid #ffff;

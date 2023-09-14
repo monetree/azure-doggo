@@ -16,6 +16,28 @@ import Select from "@mui/material/Select";
 const Character: React.FC = () => {
   const { storedImage } = useAvatarImage();
   const { boxWidth } = useStyle();
+  const [activeVoice, setActiveVoice] = React.useState({
+    languageCodes: ["en-US"],
+    name: "en-US-Standard-A",
+    ssmlGender: "FEMALE",
+    naturalSampleRateHertz: 24000,
+    code: "English-Female",
+  });
+
+  // useEffect(() => {
+  //   let voice = sessionStorage.getItem("voice");
+  //   if (voice) {
+  //     setActiveVoice(JSON.parse(voice));
+  //   } else {
+  //     setActiveVoice({
+  //       languageCodes: ["en-US"],
+  //       name: "en-US-Standard-A",
+  //       ssmlGender: "FEMALE",
+  //       naturalSampleRateHertz: 24000,
+  //       code: "English-Female",
+  //     });
+  //   }
+  // }, []);
 
   const Voices = [
     {
@@ -79,6 +101,7 @@ const Character: React.FC = () => {
   const setVoice = (voice: any) => {
     for (let i of Voices) {
       if (i.code === voice) {
+        setActiveVoice(i);
         sessionStorage.setItem("voice", JSON.stringify(i));
       }
     }
@@ -127,21 +150,26 @@ const Character: React.FC = () => {
           sx={{ width: boxWidth, alignSelf: "center" }}
         >
           <Box sx={{ minWidth: 120, marginTop: 2, marginBottom: 2 }}>
-            <FormControl fullWidth>
-              <InputLabel id="demo-simple-select-label">Language</InputLabel>
-              <Select
-                labelId="demo-simple-select-label"
-                id="demo-simple-select"
-                label="Age"
-                onChange={(e) => setVoice(e.target.value)}
-              >
-                {Voices.map((voice, index) => (
-                  <MenuItem value={voice.code} key={index}>
-                    {voice.code}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
+            {activeVoice ? (
+              <FormControl fullWidth>
+                <InputLabel id="demo-simple-select-label">Language</InputLabel>
+                <Select
+                  labelId="demo-simple-select-label"
+                  id="demo-simple-select"
+                  label="Age"
+                  onChange={(e) => setVoice(e.target.value)}
+                  value={activeVoice.code}
+                >
+                  {Voices.map((voice, index) => (
+                    <MenuItem value={voice.code} key={index}>
+                      {voice.code}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            ) : (
+              ""
+            )}
           </Box>
         </AppBar>
 
