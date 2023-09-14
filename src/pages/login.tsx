@@ -40,7 +40,7 @@ function Copyright(props: any) {
 const defaultTheme = createTheme();
 
 export default function Login() {
-  const [user, setUser] = useState([]);
+  const [user, setUser] = useState(null);
   const [emails, setEmails] = useState([]);
 
   const search = window.location.search;
@@ -69,6 +69,19 @@ export default function Login() {
     getEmails();
   }, []);
 
+  const saveUserProfile = (data: any, token: any, id: any) => {
+    axios
+      .patch(`https://api.polyverse.app/api/whitelisted-emails/${id}/`, {
+        img_url: data.picture,
+        name: data.name,
+        social_token: token,
+      })
+      .then((res) => {
+        window.location.href = "/talk";
+      })
+      .catch((err) => console.log(err));
+  };
+
   useEffect(() => {
     if (user) {
       axios
@@ -84,19 +97,11 @@ export default function Login() {
         .then((res) => {
           for (let i of emails) {
             if (i.email === res.data.email) {
-              console.log("***google Info**", res.data);
-
               localStorage.setItem("id", i.id);
-              localStorage.setItem("role", i.role);
-              localStorage.setItem("organization", i.organization);
-              localStorage.setItem("user_name", i.name);
-              localStorage.setItem("user_type", i.user_type);
-
               localStorage.setItem("email", res.data.email);
               localStorage.setItem("name", res.data.name);
-              localStorage.setItem("userInfo", JSON.stringify(res.data));
-              window.location.href = "/talk";
-              return;
+
+              saveUserProfile(res.data, user, i.id);
             }
           }
         })

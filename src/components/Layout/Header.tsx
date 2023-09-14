@@ -13,6 +13,7 @@ import Tooltip from "@mui/material/Tooltip";
 import MenuItem from "@mui/material/MenuItem";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import ModalDialog from "./Modal";
+import axios from "axios";
 
 const pages = ["Home", "Settings", "Invite", "Logout"];
 const settings = ["Home", "Settings", "Invite", "Logout"];
@@ -54,9 +55,28 @@ function ResponsiveAppBar() {
     if (page === "Invite") {
       window.location.href = "https://demo.avatarx.live/invite";
     } else if (page === "Settings") {
-      setOpen(true);
+      window.location.href = "https://demo.avatarx.live";
+    } else if (page === "Logout") {
+      localStorage.clear();
+      window.location.href = "/";
     }
   };
+
+  const [profile, setProfile] = React.useState<any>(null);
+
+  const getUser = () => {
+    const id = localStorage.getItem("id");
+    axios
+      .get(`https://api.polyverse.app/api/whitelisted-emails/${id}/`)
+      .then((res) => {
+        setProfile(res.data);
+      })
+      .catch((err) => console.log(err));
+  };
+
+  React.useEffect(() => {
+    getUser();
+  }, []);
 
   return (
     <ThemeProvider theme={darkTheme}>
@@ -148,7 +168,7 @@ function ResponsiveAppBar() {
             <Box className="settings">
               <Tooltip title="Open settings">
                 <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                  <Avatar alt="Remy Sharp" src="/static/images/avatar/2.jpg" />
+                  <Avatar alt={profile?.name} src={profile?.img_url} />
                 </IconButton>
               </Tooltip>
             </Box>
