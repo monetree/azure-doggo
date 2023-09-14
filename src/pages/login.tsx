@@ -48,11 +48,12 @@ export default function Login() {
 
   const loginUser = (email: any, data: any, token: any) => {
     axios
-      .patch(`https://api.polyverse.app/api/login/`, {
+      .post(`https://api.polyverse.app/api/login/`, {
         email: email,
         token: localStorage.getItem("org_token") || null,
       })
       .then((res) => {
+        localStorage.setItem("id", res.data.id);
         saveUserProfile(data, token, res.data.id);
       })
       .catch((err) => console.log(err));
