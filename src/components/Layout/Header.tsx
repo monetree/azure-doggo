@@ -15,8 +15,8 @@ import { ThemeProvider, createTheme } from "@mui/material/styles";
 import ModalDialog from "./Modal";
 import axios from "axios";
 
-const pages = ["Home", "Settings", "Invite", "Logout"];
-const settings = ["Home", "Settings", "Invite", "Logout"];
+const pages = ["Home", "Settings", "Logout"];
+const settings = ["Home", "Settings", "Logout"];
 
 function ResponsiveAppBar() {
   const [open, setOpen] = React.useState(false);
@@ -52,12 +52,8 @@ function ResponsiveAppBar() {
   });
 
   const redirectPage = (page: string) => {
-    if (page === "Invite") {
-      window.location.href = "https://demo.avatarx.live/invite";
-    } else if (page === "Settings") {
-      window.location.href = `https://demo.avatarx.live?token=${localStorage.getItem(
-        "token"
-      )}`;
+    if (page === "Settings") {
+      setOpen(true);
     } else if (page === "Logout") {
       localStorage.clear();
       window.location.href = "/";
