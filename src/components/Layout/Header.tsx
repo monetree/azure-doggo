@@ -55,7 +55,9 @@ function ResponsiveAppBar() {
     if (page === "Invite") {
       window.location.href = "https://demo.avatarx.live/invite";
     } else if (page === "Settings") {
-      window.location.href = "https://demo.avatarx.live";
+      window.location.href = `https://demo.avatarx.live?token=${localStorage.getItem(
+        "token"
+      )}`;
     } else if (page === "Logout") {
       localStorage.clear();
       window.location.href = "/";

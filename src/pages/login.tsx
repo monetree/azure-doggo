@@ -18,24 +18,6 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import GoogleButton from "react-google-button";
 
-function Copyright(props: any) {
-  return (
-    <Typography
-      variant="body2"
-      color="text.secondary"
-      align="center"
-      {...props}
-    >
-      {"Copyright © "}
-      <Link color="inherit" href="https://avatarx.live">
-        AvararX
-      </Link>{" "}
-      {new Date().getFullYear()}
-      {"."}
-    </Typography>
-  );
-}
-
 // TODO remove, this demo shouldn't need to reset the theme.
 const defaultTheme = createTheme();
 
@@ -161,12 +143,14 @@ export default function Login() {
             alignItems: "center",
           }}
         >
-          <Avatar sx={{ m: 1, bgcolor: "secondary.main" }}>
-            <LockOutlinedIcon />
-          </Avatar>
-          <Typography component="h1" variant="h5">
+          <Typography component="h2" variant="h4">
+            AvatarX
+          </Typography>
+          <Typography component="h2" variant="h5">
             Sign in
           </Typography>
+          <br />
+          <br />
           <Box
             component="form"
             onSubmit={handleSubmit}
@@ -176,7 +160,6 @@ export default function Login() {
             <GoogleButton onClick={() => login()} />
           </Box>
         </Box>
-        <Copyright sx={{ mt: 30, mb: 4 }} />
       </Container>
     </ThemeProvider>
   );
