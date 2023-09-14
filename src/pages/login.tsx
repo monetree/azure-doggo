@@ -77,6 +77,7 @@ export default function Login() {
         social_token: token,
       })
       .then((res) => {
+        localStorage.setItem("token", res.data.token);
         window.location.href = "/talk";
       })
       .catch((err) => console.log(err));
