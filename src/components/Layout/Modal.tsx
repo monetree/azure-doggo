@@ -13,10 +13,10 @@ export default function ModalDialog({ open, setOpen }: ModalDialogProps) {
     setOpen(false);
   };
 
-  const redirectToAvatarX = () => {
+  const redirectToAvatarX = (name) => {
     window.location.href = `https://demo.avatarx.live?email=${localStorage.getItem(
       "email"
-    )}&token=${localStorage.getItem("token")}`;
+    )}&token=${localStorage.getItem("token")}&name=${name}`;
   };
 
   const avatars = [
@@ -85,7 +85,11 @@ export default function ModalDialog({ open, setOpen }: ModalDialogProps) {
         <DialogContent>
           <div className="avatars">
             {avatars.map((avatar, index) => (
-              <div className="avatar" onClick={redirectToAvatarX} key={index}>
+              <div
+                className="avatar"
+                onClick={() => redirectToAvatarX(avatar.name)}
+                key={index}
+              >
                 <img src={avatar.img} />
 
                 <p className="text-center mt-3">
