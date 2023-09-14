@@ -23,7 +23,6 @@ const defaultTheme = createTheme();
 
 export default function Login() {
   const [user, setUser] = useState(null);
-  const [emails, setEmails] = useState([]);
 
   const search = window.location.search;
   const params = new URLSearchParams(search);
@@ -32,24 +31,6 @@ export default function Login() {
     onSuccess: (codeResponse: any) => setUser(codeResponse.access_token),
     onError: (error: any) => console.log("Login Failed:", error),
   });
-
-  const getEmails = () => {
-    axios
-      .get(`https://api.polyverse.app/api/whitelisted-emails/`, {
-        headers: {
-          Accept: "application/json",
-        },
-      })
-      .then((res) => {
-        let emails = res.data;
-        setEmails(emails);
-      })
-      .catch((err) => console.log(err));
-  };
-
-  useEffect(() => {
-    getEmails();
-  }, []);
 
   const saveUserProfile = (data: any, token: any, id: any) => {
     axios
@@ -61,6 +42,18 @@ export default function Login() {
       .then((res) => {
         localStorage.setItem("token", res.data.token);
         window.location.href = "/talk";
+      })
+      .catch((err) => console.log(err));
+  };
+
+  const loginUser = (email: any, data: any, token: any) => {
+    axios
+      .patch(`https://api.polyverse.app/api/login/`, {
+        email: email,
+        token: localStorage.getItem("org_token") || null,
+      })
+      .then((res) => {
+        saveUserProfile(data, token, res.data.id);
       })
       .catch((err) => console.log(err));
   };
@@ -78,28 +71,13 @@ export default function Login() {
           }
         )
         .then((res) => {
-          for (let i of emails) {
-            if (i.email === res.data.email) {
-              localStorage.setItem("id", i.id);
-              localStorage.setItem("email", res.data.email);
-              localStorage.setItem("name", res.data.name);
-
-              saveUserProfile(res.data, user, i.id);
-            }
-          }
+          localStorage.setItem("email", res.data.email);
+          localStorage.setItem("name", res.data.name);
+          loginUser(res.data.email, res.data, user);
         })
         .catch((err) => console.log(err));
     }
   }, [user]);
-
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    const data = new FormData(event.currentTarget);
-    console.log({
-      email: data.get("email"),
-      password: data.get("password"),
-    });
-  };
 
   const validateToken = (token: string, email: string) => {
     axios
@@ -151,12 +129,7 @@ export default function Login() {
           </Typography>
           <br />
           <br />
-          <Box
-            component="form"
-            onSubmit={handleSubmit}
-            noValidate
-            sx={{ mt: 4 }}
-          >
+          <Box component="form" noValidate sx={{ mt: 4 }}>
             <GoogleButton onClick={() => login()} />
           </Box>
         </Box>

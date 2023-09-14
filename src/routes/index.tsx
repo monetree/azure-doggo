@@ -19,10 +19,15 @@ import { useRoutes } from "react-router-dom";
 import Character from "../pages/character";
 import Personality from "../pages/personality";
 import Login from "../pages/login";
+import Invite from "../pages/Invite";
 
 /** Router */
 export function Router() {
   return useRoutes([
+    {
+      path: "/invite/:token",
+      element: <Invite />,
+    },
     {
       path: "/talk",
       element: <Character />,
