@@ -24,7 +24,8 @@ const ResponsiveGrid = () => {
     setOnSpeechFoundCallback,
   } = useSpeechRecognition();
 
-  const { convert, setOnProcessCallback } = useTextToSpeech();
+  const { convert, setOnProcessCallback, volumeDown, volumeUp } =
+    useTextToSpeech();
 
   const useZepetoModel = false;
   const { sendMessage } = useLanguageModel();
@@ -32,6 +33,7 @@ const ResponsiveGrid = () => {
   const [transcript, setTranscript] = useState<String[]>(["You", ""]);
   const [inputValue, setInputValue] = useState("");
   const [open, setOpen] = useState(false);
+  const [volumeDownState, setVolumeDownState] = useState(false);
 
   const handleChange = (event: any) => {
     setInputValue(event.target.value);
@@ -278,7 +280,14 @@ const ResponsiveGrid = () => {
             marginRight: "20px",
             cursor: "pointer",
           }}
-          onClick={() => setOnProcessCallback(null)}
+          onClick={() => {
+            if (!volumeDownState) {
+              volumeDown();
+            } else {
+              volumeUp();
+            }
+            setVolumeDownState(!volumeDownState);
+          }}
         >
           <span className="mat-button-wrapper">
             <svg

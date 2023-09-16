@@ -130,6 +130,23 @@ const useSpeechRecognition = () => {
     }
   };
 
+  const getAnswer = () => {
+    const blob = new Blob(recordedChunks.current, { type: "audio/webm" });
+    recordedChunks.current = [];
+    const reader = new FileReader();
+    reader.readAsDataURL(blob);
+    reader.onloadend = async () => {
+      const base64Data = reader.result?.toString().split(",")[1];
+      if (base64Data) {
+        setCharacterState(CharacterState.Speaking);
+        await recognize(base64Data);
+      } else {
+        setCharacterState(CharacterState.Idle);
+      }
+      talkingHead.setIsThinking(false);
+    };
+  };
+
   useEffect(() => {
     let animationFrameId: number | null = null;
     let timeoutId: NodeJS.Timeout | null = null;

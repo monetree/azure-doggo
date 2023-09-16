@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { useContext, useEffect } from "react";
+import { useContext, useEffect, useState } from "react";
 
 import { ConfigContext } from "../context/config";
 import {
@@ -82,6 +82,7 @@ const useLanguageModel = (): LanguageModel => {
 
   let context = "";
   let messages: MessageProps[] = [];
+  let prevResponse = "";
 
   const sendPrompt = async (payload: any) => {
     var myHeaders = new Headers();
@@ -100,22 +101,36 @@ const useLanguageModel = (): LanguageModel => {
   }, [config]);
 
   const sendMessage = async (message: string): Promise<string> => {
+    const messages = [
+      {
+        role: "system",
+        content: "You are a virtual teacher. Answer question in 100 words.",
+      },
+      {
+        role: "user",
+        content: message,
+      },
+    ];
+
+    console.log("prevResponse", prevResponse);
+    if (prevResponse) {
+      messages.push({
+        role: "assistant",
+        content: prevResponse,
+      });
+    }
+
+    console.log(messages);
+
     const payload = {
       model: "gpt-3.5-turbo",
-      messages: [
-        {
-          role: "system",
-          content: "You are a virtual teacher. Answer question in 50 words.",
-        },
-        {
-          role: "user",
-          content: message,
-        },
-      ],
+      messages: messages,
     };
 
     const response = await sendPrompt(payload);
-    return response.choices[0].message.content;
+    const content = response.choices[0].message.content;
+    prevResponse += content;
+    return content;
   };
 
   return {

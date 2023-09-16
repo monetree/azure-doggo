@@ -44,6 +44,13 @@ interface AudioProcessCallback {
 
 const useTextToSpeech = () => {
   const audioContext = useRef(new AudioContext());
+  const gainNode = audioContext.current.createGain();
+  var oscillator = audioContext.current.createOscillator();
+  oscillator.type = "square";
+  oscillator.frequency.value = 500;
+  oscillator.connect(gainNode);
+  gainNode.connect(audioContext.current.destination);
+
   const processor = useRef(
     audioContext.current.createScriptProcessor(1024, 1, 1)
   );
@@ -240,9 +247,19 @@ const useTextToSpeech = () => {
     });
   };
 
+  const volumeDown = async () => {
+    gainNode.gain.setValueAtTime(0.0, audioContext.current.currentTime);
+  };
+
+  const volumeUp = async () => {
+    gainNode.gain.setValueAtTime(1, audioContext.current.currentTime);
+  };
+
   return {
     convert,
     setOnProcessCallback,
+    volumeDown,
+    volumeUp,
   };
 };
 
