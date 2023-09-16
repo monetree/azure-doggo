@@ -43,10 +43,8 @@ const ResponsiveGrid = () => {
     });
     setOnSpeechFoundCallback((transcription: string) => {
       setTranscript(["You", transcription]);
-      console.log("You", transcription);
       sendMessage(transcription).then((result) => {
         setTranscript(["Buddy", result]);
-        console.log("Buddy", result);
         convert(result).then(() => {
           setCharacterState(CharacterState.Idle);
         });
@@ -268,7 +266,7 @@ const ResponsiveGrid = () => {
         {characterStateIcon[characterState]}
         {characterStateBits[characterState]}
 
-        <button
+        {/* <button
           id="mute-icon"
           color="primary"
           className="un-mute mat-focus-indicator microphone mat-fab mat-button-base mat-primary"
@@ -280,7 +278,7 @@ const ResponsiveGrid = () => {
             marginRight: "20px",
             cursor: "pointer",
           }}
-          onClick={() => setOpen(true)}
+          onClick={() => setOnProcessCallback(null)}
         >
           <span className="mat-button-wrapper">
             <svg
@@ -297,7 +295,7 @@ const ResponsiveGrid = () => {
           </span>
           <span className="mat-ripple mat-button-ripple mat-button-ripple-round"></span>
           <span className="mat-button-focus-overlay"></span>
-        </button>
+        </button> */}
 
         <div className="form-container">
           <TextField
