@@ -83,6 +83,7 @@ const useSpeechRecognition = () => {
           recordedChunks.current.push(event.data);
         }
       };
+
       mediaRecorder.current.start();
       setCharacterState(CharacterState.Listening);
       // talkingHead.setIsThinking(true);
@@ -114,6 +115,7 @@ const useSpeechRecognition = () => {
         }
       });
       const blob = new Blob(recordedChunks.current, { type: "audio/webm" });
+      console.log("blobblobblob", blob);
       recordedChunks.current = [];
       const reader = new FileReader();
       reader.readAsDataURL(blob);
@@ -130,22 +132,100 @@ const useSpeechRecognition = () => {
     }
   };
 
-  const getAnswer = () => {
-    const blob = new Blob(recordedChunks.current, { type: "audio/webm" });
-    recordedChunks.current = [];
-    const reader = new FileReader();
-    reader.readAsDataURL(blob);
-    reader.onloadend = async () => {
-      const base64Data = reader.result?.toString().split(",")[1];
-      if (base64Data) {
-        setCharacterState(CharacterState.Speaking);
-        await recognize(base64Data);
-      } else {
-        setCharacterState(CharacterState.Idle);
-      }
-      talkingHead.setIsThinking(false);
-    };
+  const [talkStarted, setTalkStarted] = useState(false);
+  const [volumes, setVolumes] = useState([]);
+
+  const answerNow = async () => {
+    console.log("mediaRecorder.current", mediaRecorder.current.stream);
+    if (mediaRecorder.current) {
+      mediaRecorder.current.stop();
+      await new Promise((resolve) => {
+        if (mediaRecorder.current) {
+          mediaRecorder.current.onstop = () => {
+            resolve(null);
+          };
+        }
+      });
+
+      const blob = new Blob(recordedChunks.current, { type: "audio/webm" });
+      console.log("blob", blob);
+      recordedChunks.current = [];
+      const reader = new FileReader();
+      reader.readAsDataURL(blob);
+      reader.onloadend = async () => {
+        const base64Data = reader.result?.toString().split(",")[1];
+        console.log("base64Data", base64Data);
+        if (base64Data) {
+          await recognize(base64Data);
+        }
+
+        mediaRecorder.current.start();
+      };
+    }
   };
+
+  useEffect(() => {
+    // let vol_ = volumes.slice(Math.max(volumes.length - 3, 0));
+    const nums = volumes.filter((val) => val !== 0);
+    if (!nums.length) return;
+    if (volumes.length > 10) {
+      const last_1 = volumes[volumes.length - 1];
+      const last_2 = volumes[volumes.length - 2];
+      if (!last_1 && !last_2) {
+        answerNow();
+        setVolumes([]);
+      }
+    }
+  }, [volumes]);
+
+  useEffect(() => {
+    let animationFrameId: number | null = null;
+    let timeoutId: NodeJS.Timeout | null = null;
+
+    const animationLoop = () => {
+      if (!analyser.current) return;
+
+      analyser.current.fftSize = 32;
+      const bufferLength = analyser.current.frequencyBinCount;
+      const dataArray = new Uint8Array(bufferLength);
+
+      analyser.current.getByteFrequencyData(dataArray);
+
+      const avgVolume =
+        dataArray.reduce((acc, val) => acc + val) / bufferLength;
+
+      if (avgVolume > 50) {
+        setTalkStarted(true);
+        setVolumes((prevArray) => [...prevArray, 1]);
+      } else {
+        setVolumes((prevArray) => [...prevArray, 0]);
+      }
+
+      timeoutId = setTimeout(() => {
+        animationFrameId = requestAnimationFrame(animationLoop);
+      }, 1000);
+    };
+
+    if (characterState === CharacterState.Listening) {
+      animationLoop();
+    } else {
+      if (animationFrameId !== null) {
+        cancelAnimationFrame(animationFrameId);
+      }
+      if (timeoutId !== null) {
+        clearTimeout(timeoutId);
+      }
+    }
+
+    return () => {
+      if (animationFrameId !== null) {
+        cancelAnimationFrame(animationFrameId);
+      }
+      if (timeoutId !== null) {
+        clearTimeout(timeoutId);
+      }
+    };
+  }, [characterState, bars, analyser]);
 
   useEffect(() => {
     let animationFrameId: number | null = null;

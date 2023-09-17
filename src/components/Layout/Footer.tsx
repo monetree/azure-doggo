@@ -48,7 +48,7 @@ const ResponsiveGrid = () => {
       sendMessage(transcription).then((result) => {
         setTranscript(["Buddy", result]);
         convert(result).then(() => {
-          setCharacterState(CharacterState.Idle);
+          // setCharacterState(CharacterState.Idle);
         });
       });
     });
