@@ -104,7 +104,7 @@ const useLanguageModel = (): LanguageModel => {
     const messages = [
       {
         role: "system",
-        content: "You are a virtual teacher. Answer question in 50 words.",
+        content: "Act as a virtual teacher.",
       },
       {
         role: "user",
@@ -123,8 +123,8 @@ const useLanguageModel = (): LanguageModel => {
     console.log(messages);
 
     const payload = {
-      // model: "gpt-3.5-turbo",
-      model: "gpt-4-0314",
+      model: "gpt-3.5-turbo",
+      // model: "gpt-4-0314",
       messages: messages,
     };
 
