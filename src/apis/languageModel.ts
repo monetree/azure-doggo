@@ -129,7 +129,7 @@ const useLanguageModel = (): LanguageModel => {
 
     const response = await sendPrompt(payload);
     const content = response.choices[0].message.content;
-    prevResponse += content;
+    prevResponse = content;
     return content;
   };
 
