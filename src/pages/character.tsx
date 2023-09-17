@@ -62,27 +62,6 @@ const Character: React.FC = () => {
       code: "Hindi-Female",
     },
     {
-      languageCodes: ["hi-IN"],
-      name: "hi-IN-Wavenet-B",
-      ssmlGender: "MALE",
-      naturalSampleRateHertz: 24000,
-      code: "Hindi-Male",
-    },
-    {
-      languageCodes: ["te-IN"],
-      name: "te-IN-Standard-A",
-      ssmlGender: "FEMALE",
-      naturalSampleRateHertz: 24000,
-      code: "Telugu-Female",
-    },
-    {
-      languageCodes: ["te-IN"],
-      name: "te-IN-Standard-B",
-      ssmlGender: "MALE",
-      naturalSampleRateHertz: 24000,
-      code: "Telugu-Male",
-    },
-    {
       languageCodes: ["bn-IN"],
       name: "bn-IN-Standard-A",
       ssmlGender: "FEMALE",
@@ -94,7 +73,14 @@ const Character: React.FC = () => {
       name: "fil-PH-Standard-A",
       ssmlGender: "FEMALE",
       naturalSampleRateHertz: 24000,
-      code: "Philippines-Female",
+      code: "Filipino Female",
+    },
+    {
+      languageCodes: ["es-ES"],
+      name: "es-ES-Neural2-A",
+      ssmlGender: "FEMALE",
+      naturalSampleRateHertz: 24000,
+      code: "Spanish Female",
     },
   ];
 
