@@ -54,6 +54,8 @@ export default function Login() {
       })
       .then((res) => {
         localStorage.setItem("id", res.data.id);
+        localStorage.setItem("email", res.data.email);
+        localStorage.setItem("name", res.data.name);
         saveUserProfile(data, token, res.data.id);
       })
       .catch((err) => console.log(err));

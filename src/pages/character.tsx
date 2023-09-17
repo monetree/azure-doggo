@@ -12,6 +12,7 @@ import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
 import Select from "@mui/material/Select";
+import { datadogRum } from "@datadog/browser-rum";
 
 const Character: React.FC = () => {
   const { storedImage } = useAvatarImage();
@@ -111,7 +112,11 @@ const Character: React.FC = () => {
     if (!user) {
       window.location.href = "/";
     } else {
-      // turnAudio();
+      datadogRum.setUser({
+        id: localStorage.getItem("email"),
+        name: localStorage.getItem("email"),
+        email: localStorage.getItem("email"),
+      });
     }
   }, []);
 
