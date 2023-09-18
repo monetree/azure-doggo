@@ -21,7 +21,13 @@ import {
   LANGUAGE_MODEL_API_KEY,
   LANGUAGE_MODEL_URL,
 } from "../context/constants";
-
+import { ChatOpenAI } from "langchain/chat_models/openai";
+import { HumanMessage, ChatMessage, SystemMessage } from "langchain/schema";
+import {
+  ChatPromptTemplate,
+  SystemMessagePromptTemplate,
+  HumanMessagePromptTemplate
+} from "langchain/prompts";
 /**
  * Represents a message object with an author and content.
  * @interface
@@ -84,16 +90,16 @@ const useLanguageModel = (): LanguageModel => {
   let messages: MessageProps[] = [];
   let prevResponse = "";
 
-  const sendPrompt = async (payload: any) => {
-    var myHeaders = new Headers();
-    myHeaders.append("Authorization", `Bearer ${LANGUAGE_MODEL_API_KEY}`);
-    myHeaders.append("Content-Type", "application/json");
-    const response = await fetch(LANGUAGE_MODEL_URL, {
-      headers: myHeaders,
-      body: JSON.stringify(payload),
-      method: "POST",
+  const sendPrompt = async (formattedPrompt: any) => {
+    // console.log(process.env.REACT_APP_OPENAI_API_KEY);
+    const api_key = process.env.REACT_APP_OPENAI_API_KEY;
+    const chat = new ChatOpenAI({
+      openAIApiKey: api_key,
     });
-    return response.json();
+
+    const result = await chat.predictMessages(formattedPrompt);
+    console.log('Respnse is :', result.content)
+    return result
   };
 
   useEffect(() => {
@@ -101,37 +107,29 @@ const useLanguageModel = (): LanguageModel => {
   }, [config]);
 
   const sendMessage = async (message: string): Promise<string> => {
-    const messages = [
-      {
-        role: "system",
-        content: "Act as a virtual teacher. Answer question in 30 words",
-      },
-      {
-        role: "user",
-        content: message,
-      },
-    ];
 
-    console.log("prevResponse", prevResponse);
-    if (prevResponse) {
-      messages.push({
-        role: "assistant",
-        content: prevResponse,
-      });
-    }
+    const template = `You are a very smart and funny {subject} teacher. Your task is 
+              to acting as a teacher for various subjects. 
+              Please give precise answers for the questions you are asked. 
+              Don't make it more than 30 words.`;
+    const systemMessagePrompt = SystemMessagePromptTemplate.fromTemplate(template);
+    const humanTemplate = "{text}";
+    const humanMessagePrompt = HumanMessagePromptTemplate.fromTemplate(humanTemplate);
+    // You can also pass ["{role}", "{template}"] tuples into the `.fromPromptMessages()` method
+    // and they will be automatically converted into message prompts.
+    // const systemMessagePrompt = ["system", template];
+    // const humanMessagePrompt = ["user", humanTemplate];
+    
+    const chatPrompt = ChatPromptTemplate.fromPromptMessages([systemMessagePrompt, humanMessagePrompt]);
+    
+    const formattedPrompt = await chatPrompt.formatMessages({
+      personality: "great",
+      subject: "English",
+      text: message
+    });
 
-    console.log(messages);
-
-    const payload = {
-      model: "gpt-3.5-turbo",
-      // model: "gpt-4-0314",
-      messages: messages,
-    };
-
-    const response = await sendPrompt(payload);
-    const content = response.choices[0].message.content;
-    prevResponse = content;
-    return content;
+    const response = await sendPrompt(formattedPrompt);
+    return response.content;
   };
 
   return {
