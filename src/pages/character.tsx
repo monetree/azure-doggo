@@ -21,7 +21,7 @@ const Character: React.FC = () => {
   const { boxWidth } = useStyle();
   const [activeVoice, setActiveVoice] = React.useState({
     languageCodes: ["en-US"],
-    name: "en-US-Standard-A",
+    name: "en-US-Standard-C",
     ssmlGender: "FEMALE",
     naturalSampleRateHertz: 24000,
     code: "English-Female",
@@ -45,7 +45,7 @@ const Character: React.FC = () => {
   const Voices = [
     {
       languageCodes: ["en-US"],
-      name: "en-US-Standard-A",
+      name: "en-US-Standard-C",
       ssmlGender: "FEMALE",
       naturalSampleRateHertz: 24000,
       code: "English-Female",

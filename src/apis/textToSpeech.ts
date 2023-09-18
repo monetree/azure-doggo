@@ -150,7 +150,7 @@ const useTextToSpeech = () => {
           languageCode: language
             ? JSON.parse(language)["languageCodes"][0]
             : "en-US",
-          name: language ? JSON.parse(language).name : "en-US-Standard-B",
+          name: language ? JSON.parse(language).name : "en-US-Standard-C",
         },
       },
       GOOGLE_CLOUD_API_KEY
