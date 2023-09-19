@@ -55,6 +55,7 @@ const ResponsiveGrid = () => {
   }, []);
 
   const handleInput = (e: any) => {
+    e.preventDefault();
     const bigForm = document.getElementById(
       "standard-basic"
     ) as HTMLInputElement;
@@ -209,6 +210,7 @@ const ResponsiveGrid = () => {
           onChange={handleChange}
         />
         <Button
+          type="submit"
           variant="outlined"
           style={{ border: "2px solid #fff", float: "right" }}
           onClick={handleInput}
@@ -285,6 +287,7 @@ const ResponsiveGrid = () => {
             style={{ width: "500px" }}
           />
           <Button
+            type="submit"
             variant="outlined"
             style={{ padding: "19px 15px", border: "2px solid #fff" }}
             onClick={handleInput}
