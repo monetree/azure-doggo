@@ -21,13 +21,15 @@ import {
   LANGUAGE_MODEL_API_KEY,
   LANGUAGE_MODEL_URL,
 } from "../context/constants";
+import { ConversationChain } from "langchain/chains";
 import { ChatOpenAI } from "langchain/chat_models/openai";
-import { HumanMessage, ChatMessage, SystemMessage } from "langchain/schema";
 import {
   ChatPromptTemplate,
+  HumanMessagePromptTemplate,
   SystemMessagePromptTemplate,
-  HumanMessagePromptTemplate
+  MessagesPlaceholder,
 } from "langchain/prompts";
+import { BufferMemory } from "langchain/memory";
 /**
  * Represents a message object with an author and content.
  * @interface
@@ -90,15 +92,39 @@ const useLanguageModel = (): LanguageModel => {
   let messages: MessageProps[] = [];
   let prevResponse = "";
 
-  const sendPrompt = async (formattedPrompt: any) => {
-    // console.log(process.env.REACT_APP_OPENAI_API_KEY);
-    const api_key = process.env.REACT_APP_OPENAI_API_KEY;
-    const chat = new ChatOpenAI({
-      openAIApiKey: api_key,
-    });
+// Langchain variables
+const api_key = process.env.REACT_APP_OPENAI_API_KEY;
 
-    const result = await chat.predictMessages(formattedPrompt);
-    console.log('Respnse is :', result.content)
+  const chat = new ChatOpenAI({openAIApiKey: api_key,temperature: 0});
+  const chatPrompt = ChatPromptTemplate.fromPromptMessages([
+    SystemMessagePromptTemplate.fromTemplate(
+      `You are a very smart and funny teacher. Your task is 
+      to acting as a teacher for various subjects. 
+      Please give precise answers for the questions you are asked. 
+      Don't make it more than 30 words.`
+      ),
+    new MessagesPlaceholder("history"),
+    HumanMessagePromptTemplate.fromTemplate("{input}"),
+  ]);
+
+  // Return the current conversation directly as messages and insert them into the MessagesPlaceholder in the above prompt.
+  const memory = new BufferMemory({
+    returnMessages: true,
+    memoryKey: "history"
+  });
+
+  const chain = new ConversationChain({
+    memory,
+    prompt: chatPrompt,
+    llm: chat,
+    // verbose: true,
+  });
+
+  const sendPrompt = async (human_message) => {
+    const result = await chain.call({
+      input: human_message,
+      // history: "The history of the chat coming from database.",
+    });
     return result
   };
 
@@ -106,30 +132,12 @@ const useLanguageModel = (): LanguageModel => {
     context = `Your task is to acting as a character that has this personality: "${config.state.personality}". Your response must be based on your personality. You have this backstory: "${config.state.backStory}". Your knowledge base is: "${config.state.knowledgeBase}". The response should be one single sentence only.`;
   }, [config]);
 
-  const sendMessage = async (message: string): Promise<string> => {
+  const sendMessage = async (human_message: string): Promise<string> => {
 
-    const template = `You are a very smart and funny {subject} teacher. Your task is 
-              to acting as a teacher for various subjects. 
-              Please give precise answers for the questions you are asked. 
-              Don't make it more than 30 words.`;
-    const systemMessagePrompt = SystemMessagePromptTemplate.fromTemplate(template);
-    const humanTemplate = "{text}";
-    const humanMessagePrompt = HumanMessagePromptTemplate.fromTemplate(humanTemplate);
-    // You can also pass ["{role}", "{template}"] tuples into the `.fromPromptMessages()` method
-    // and they will be automatically converted into message prompts.
-    // const systemMessagePrompt = ["system", template];
-    // const humanMessagePrompt = ["user", humanTemplate];
-    
-    const chatPrompt = ChatPromptTemplate.fromPromptMessages([systemMessagePrompt, humanMessagePrompt]);
-    
-    const formattedPrompt = await chatPrompt.formatMessages({
-      personality: "great",
-      subject: "English",
-      text: message
-    });
 
-    const response = await sendPrompt(formattedPrompt);
-    return response.content;
+    const response = await sendPrompt(human_message);
+    console.log('The Response from the bot is: ', response.response)
+    return response.response;
   };
 
   return {
