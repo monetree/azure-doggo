@@ -112,9 +112,8 @@ const api_key = process.env.REACT_APP_OPENAI_API_KEY;
     returnMessages: true,
     memoryKey: "history"
   });
-
   const chain = new ConversationChain({
-    memory,
+    memory:memory,
     prompt: chatPrompt,
     llm: chat,
     // verbose: true,
@@ -123,7 +122,6 @@ const api_key = process.env.REACT_APP_OPENAI_API_KEY;
   const sendPrompt = async (human_message) => {
     const result = await chain.call({
       input: human_message,
-      // history: "The history of the chat coming from database.",
     });
     return result
   };
