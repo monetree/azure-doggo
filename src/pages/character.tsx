@@ -13,13 +13,15 @@ import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
 import Select from "@mui/material/Select";
 import { datadogRum } from "@datadog/browser-rum";
+import { useNavigate } from "react-router-dom";
 
 const Character: React.FC = () => {
   const { storedImage } = useAvatarImage();
+  const navigate = useNavigate();
   const { boxWidth } = useStyle();
   const [activeVoice, setActiveVoice] = React.useState({
     languageCodes: ["en-US"],
-    name: "en-US-Standard-A",
+    name: "en-US-Standard-C",
     ssmlGender: "FEMALE",
     naturalSampleRateHertz: 24000,
     code: "English-Female",
@@ -43,7 +45,7 @@ const Character: React.FC = () => {
   const Voices = [
     {
       languageCodes: ["en-US"],
-      name: "en-US-Standard-A",
+      name: "en-US-Standard-C",
       ssmlGender: "FEMALE",
       naturalSampleRateHertz: 24000,
       code: "English-Female",
@@ -110,7 +112,7 @@ const Character: React.FC = () => {
   useEffect(() => {
     const user = localStorage.getItem("id");
     if (!user) {
-      window.location.href = "/";
+      navigate("/");
     } else {
       datadogRum.setUser({
         id: localStorage.getItem("email"),

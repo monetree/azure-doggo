@@ -36,6 +36,8 @@ datadogRum.init({
   defaultPrivacyLevel: "mask-user-input",
 });
 
+datadogRum.startSessionReplayRecording();
+
 /**  App  */
 export function App() {
   return (

@@ -107,28 +107,8 @@ const useSpeechRecognition = () => {
     }
     if (mediaRecorder.current) {
       mediaRecorder.current.stop();
-      await new Promise((resolve) => {
-        if (mediaRecorder.current) {
-          mediaRecorder.current.onstop = () => {
-            resolve(null);
-          };
-        }
-      });
-      const blob = new Blob(recordedChunks.current, { type: "audio/webm" });
-      console.log("blobblobblob", blob);
-      recordedChunks.current = [];
-      const reader = new FileReader();
-      reader.readAsDataURL(blob);
-      reader.onloadend = async () => {
-        const base64Data = reader.result?.toString().split(",")[1];
-        if (base64Data) {
-          setCharacterState(CharacterState.Speaking);
-          await recognize(base64Data);
-        } else {
-          setCharacterState(CharacterState.Idle);
-        }
-        talkingHead.setIsThinking(false);
-      };
+      setCharacterState(CharacterState.Idle);
+      // talkingHead.setIsThinking(false);
     }
   };
 
