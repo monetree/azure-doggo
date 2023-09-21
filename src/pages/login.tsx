@@ -8,6 +8,7 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import GoogleButton from "react-google-button";
 import { useNavigate } from "react-router-dom";
+import CircularIndeterminate from "../components/Layout/Loader";
 
 // TODO remove, this demo shouldn't need to reset the theme.
 const defaultTheme = createTheme();
@@ -16,6 +17,7 @@ export default function Login() {
   const navigate = useNavigate();
 
   const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   const search = window.location.search;
   const params = new URLSearchParams(search);
@@ -56,6 +58,7 @@ export default function Login() {
 
   useEffect(() => {
     if (user) {
+      setLoading(true);
       axios
         .get(
           `https://www.googleapis.com/oauth2/v1/userinfo?access_token=${user}`,
@@ -76,6 +79,7 @@ export default function Login() {
   }, [user]);
 
   const validateToken = (token: string, email: string) => {
+    setLoading(true);
     axios
       .post(`https://api.polyverse.app/api/verify-token/`, {
         token: token,
@@ -89,7 +93,8 @@ export default function Login() {
       })
       .catch((err) => {
         console.log(err);
-      });
+      })
+      .finally(() => setLoading(false));
   };
 
   useEffect(() => {
@@ -109,6 +114,7 @@ export default function Login() {
     <ThemeProvider theme={defaultTheme}>
       <Container component="main" maxWidth="xs">
         <CssBaseline />
+        {loading ? <CircularIndeterminate /> : null}
         <Box
           sx={{
             marginTop: 16,
