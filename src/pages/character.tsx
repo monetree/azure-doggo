@@ -4,7 +4,6 @@ import useAvatarImage from "../apis/avatarImage";
 import useStyle, { COLORS } from "./styles";
 import { Canvas } from "@react-three/fiber";
 import { Doggo } from "../components/ThreeJS/Doggo07";
-import { ZEPETO_TORSO_3 } from "../components/ThreeJS/ZEPETO_TORSO_3";
 import ResponsiveAppBar from "../components/Layout/Header";
 import ResponsiveGrid from "../components/Layout/Footer";
 import { ThemeProvider, createTheme } from "@mui/material/styles";

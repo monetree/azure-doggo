@@ -85,6 +85,11 @@ type LanguageModel = {
   sendMessage: (message: string) => Promise<string>;
 };
 
+const memory = new BufferMemory({
+  returnMessages: true,
+  memoryKey: "history",
+});
+
 const useLanguageModel = (): LanguageModel => {
   const config = useContext(ConfigContext);
 
@@ -92,38 +97,35 @@ const useLanguageModel = (): LanguageModel => {
   let messages: MessageProps[] = [];
   let prevResponse = "";
 
-// Langchain variables
-const api_key = process.env.REACT_APP_OPENAI_API_KEY;
+  // Langchain variables
+  const api_key = process.env.REACT_APP_OPENAI_API_KEY;
 
-  const chat = new ChatOpenAI({openAIApiKey: api_key,temperature: 0});
+  const chat = new ChatOpenAI({ openAIApiKey: api_key, temperature: 0 });
   const chatPrompt = ChatPromptTemplate.fromPromptMessages([
     SystemMessagePromptTemplate.fromTemplate(
       `You are a very smart and funny teacher. Your task is 
       to acting as a teacher for various subjects. 
       Please give precise answers for the questions you are asked. 
       Don't make it more than 30 words.`
-      ),
+    ),
     new MessagesPlaceholder("history"),
     HumanMessagePromptTemplate.fromTemplate("{input}"),
   ]);
 
   // Return the current conversation directly as messages and insert them into the MessagesPlaceholder in the above prompt.
-  const memory = new BufferMemory({
-    returnMessages: true,
-    memoryKey: "history"
-  });
+
   const chain = new ConversationChain({
-    memory:memory,
+    memory: memory,
     prompt: chatPrompt,
     llm: chat,
     // verbose: true,
   });
 
-  const sendPrompt = async (human_message) => {
+  const sendPrompt = async (human_message: string) => {
     const result = await chain.call({
       input: human_message,
     });
-    return result
+    return result;
   };
 
   useEffect(() => {
@@ -131,10 +133,7 @@ const api_key = process.env.REACT_APP_OPENAI_API_KEY;
   }, [config]);
 
   const sendMessage = async (human_message: string): Promise<string> => {
-
-
     const response = await sendPrompt(human_message);
-    console.log('The Response from the bot is: ', response.response)
     return response.response;
   };
 

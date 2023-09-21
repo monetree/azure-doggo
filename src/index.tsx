@@ -14,27 +14,34 @@
  * limitations under the License.
  */
 
-import React from 'react';
-import ReactDOM from 'react-dom/client';
-import './index.css';
-import { App } from './App';
-import { Layout } from './components/Layout';
-import { ConfigProvider } from './context/config';
-import { reportWebVitals } from './reportWebVitals';
+import React from "react";
+import ReactDOM from "react-dom/client";
+import "./index.css";
+import { App } from "./App";
+import { Layout } from "./components/Layout";
+import { ConfigProvider } from "./context/config";
+import { reportWebVitals } from "./reportWebVitals";
+import CircularIndeterminate from "./components/Layout/Loader";
 
 const root = ReactDOM.createRoot(
-  document.getElementById('root') as HTMLElement
+  document.getElementById("root") as HTMLElement
 );
 
 root.render(
   // <React.StrictMode>
-    <ConfigProvider>
-      <React.Suspense fallback={<div>Loading...</div>}>
-        <Layout>
-          <App />
-        </Layout>
-      </React.Suspense>
-    </ConfigProvider>
+  <ConfigProvider>
+    <React.Suspense
+      fallback={
+        <div>
+          <CircularIndeterminate />
+        </div>
+      }
+    >
+      <Layout>
+        <App />
+      </Layout>
+    </React.Suspense>
+  </ConfigProvider>
   // </React.StrictMode>
 );
 
