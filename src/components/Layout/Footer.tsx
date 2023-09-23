@@ -2,7 +2,7 @@ import useSpeechRecognition, {
   CharacterState,
 } from "../../apis/speechRecognition";
 import useLanguageModel from "../../apis/languageModel";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import useTextToSpeech from "../../apis/textToSpeech";
 import * as talkingHead from "../../apis/talkingHead";
 import TextField from "@mui/material/TextField";
@@ -24,13 +24,20 @@ const ResponsiveGrid = () => {
     setOnSpeechFoundCallback,
   } = useSpeechRecognition();
 
+  const userEmail = localStorage.getItem("email");
+  const [messages, setMessages] = useState<Array<{ type: string, content: string }>>([]);
   const { convert, setOnProcessCallback, volumeDown, volumeUp } =
     useTextToSpeech();
 
   const useZepetoModel = false;
+  const messagesEndRef = useRef(null);
+
   const { sendMessage } = useLanguageModel();
   talkingHead.runBlendshapesDemo(useZepetoModel);
+  const [conversation, setConversation] = useState<Array<{user_text: string, bot_text: string}>>([]);
   const [transcript, setTranscript] = useState<String[]>(["You", ""]);
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+  const [isVisible, setIsVisible] = useState(true);
   const [inputValue, setInputValue] = useState("");
   const [open, setOpen] = useState(false);
   const [volumeDownState, setVolumeDownState] = useState(false);
@@ -38,21 +45,68 @@ const ResponsiveGrid = () => {
   const handleChange = (event: any) => {
     setInputValue(event.target.value);
   };
+  useEffect(() => {
+        const handleResize = () => setIsMobile(window.innerWidth <= 768);
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
+
+  useEffect(() => {
+      if (messagesEndRef.current) {
+          messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
+      }
+  }, [messages]);
+  
 
   useEffect(() => {
     setOnProcessCallback((audioData: Float32Array) => {
       talkingHead.registerCallback(audioData);
     });
-    setOnSpeechFoundCallback((transcription: string) => {
-      setTranscript(["You", transcription]);
-      sendMessage(transcription).then((result) => {
-        setTranscript(["Buddy", result]);
-        convert(result).then(() => {
-          // setCharacterState(CharacterState.Idle);
+      setOnSpeechFoundCallback((transcription: string) => {
+        setTranscript(["You", transcription]);
+        addMessage("You", transcription);
+        sendMessage(transcription).then((result) => {
+          addMessage("Buddy", result);
+          sendPostRequest(userEmail, transcription, result)
+            .then(response => {
+              if (!response.ok) {
+                throw new Error('Network response was not ok for POST request');
+              }
+              return response.json();
+            })
+            .catch(error => {
+              console.error('There was a problem with the request:', error);
+            });
+
+          convert(result).then(() => {
+            // setCharacterState(CharacterState.Idle);
+          });
         });
       });
-    });
+
   }, []);
+
+
+  const sendPostRequest = (userEmail, transcription, result) => {
+    return fetch("http://127.0.0.1:8000/api/conversations/", {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        email: userEmail,
+        user_text: transcription,
+        bot_text: result
+      })
+    });
+  };
+
+  const addMessage = (type: string, content: string) => {
+    setMessages(prevMessages => {
+      const updatedMessages = [...prevMessages, { type, content }];
+      return updatedMessages.slice(-21);
+    });
+  };
 
   const handleInput = (e: any) => {
     e.preventDefault();
@@ -75,8 +129,11 @@ const ResponsiveGrid = () => {
     } catch (error) {}
 
     setTranscript(["You", inputValue]);
+    addMessage("You", inputValue);
     sendMessage(inputValue).then((result) => {
       setTranscript(["Buddy", result]);
+      sendPostRequest(userEmail, inputValue, result)
+      addMessage("Buddy", result);
       convert(result).then(() => {
         setInputValue("");
         setCharacterState(CharacterState.Idle);
@@ -202,35 +259,131 @@ const ResponsiveGrid = () => {
   return (
     <div>
       <div className="form-container-sm">
+      <div style={{
+                position: 'fixed',
+                bottom: '3px',
+                left: '1px',
+                right: '1px',
+                display: 'flex',
+                alignItems: 'center', 
+                }}>
+          <form
+            onSubmit={(e) => {
+                handleInput(e)
+            }}
+            style={{
+                flex: '0 0 85%', 
+            }}
+          >
         <TextField
           id="outlined-basic"
           label="Type your question here .. "
           variant="outlined"
+          size="small" 
           value={inputValue}
           onChange={handleChange}
         />
-        <Button
-          type="submit"
-          variant="outlined"
-          style={{ border: "2px solid #fff", float: "right" }}
-          onClick={handleInput}
-        >
-          <svg
+    </form>
+      <Button
+        type="submit"
+        variant="outlined"
+        style={{
+            minWidth: '5px', 
+            border: "1px solid #fff",
+        }}
+        onClick={handleInput}
+    >
+        <svg
             xmlns="http://www.w3.org/2000/svg"
-            height="1em"
+            height="2em"
+            width='2em'
             viewBox="0 0 448 512"
             fill="#fff"
-          >
+        >
             <path d="M438.6 278.6c12.5-12.5 12.5-32.8 0-45.3l-160-160c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L338.8 224 32 224c-17.7 0-32 14.3-32 32s14.3 32 32 32l306.7 0L233.4 393.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0l160-160z" />
-          </svg>
-        </Button>
-      </div>
+        </svg>
+    </Button>
+</div>
 
+
+      </div>
+      {
+      isVisible &&
+      <div style={{
+           width: '100%',
+            maxWidth: isMobile ? '90%' : '500px',
+            maxHeight:isMobile ? '40%' :'auto',
+            overflowY: 'auto',
+            position: isMobile ? 'fixed' : 'absolute',
+            right: '5px',
+            left:isMobile ? '90':'auto',
+            bottom: isMobile ? '95px' : '80px',
+            top: isMobile ? '350px' : '100px',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+            zIndex: 1000,
+            boxShadow: isMobile ? '0px 0px 15px rgba(0, 0, 0, 0.15)' : 'none',
+        }}>
+           
+
+          {messages.map((message, index) => (
+            <div key={index} style={{
+              display: 'flex',
+              justifyContent: message.type === 'You' ? 'flex-end' : 'flex-start',
+              margin: '10px 0'
+            }}>
+        <div style={{ 
+            display: 'flex',
+            flexDirection: 'column',
+            maxWidth: '100%'  
+        }}>
+            <div style={{
+              fontWeight: 'bold',
+              marginBottom: '5px',
+              color:'blue',
+            }}>
+                {message.type}
+            </div>
+            <div style={{
+              padding: '20px',
+              borderRadius: '10px',
+              backgroundColor: message.type === 'You' ? '#E9EBF8' : '#D4E6A6',
+              color: 'black'
+            }}>
+                <div>{message.content}</div>
+            </div>
+        </div>
+        {
+          messages.length > 0 && 
+          <button 
+              style={{
+                  position: 'fixed', 
+                  bottom: '70px', 
+                  right: '10px', 
+                  background: 'blue', 
+                  color: 'white', 
+                  border: 'none', 
+                  borderRadius: '50%',
+                  cursor: 'pointer',
+                  fontSize:'20px'
+              }}
+              onClick={() => setIsVisible(false)}
+          >
+              X
+          </button>
+        }
+    </div>
+))}
+ <div ref={messagesEndRef}></div>
+
+</div>
+}
       <div
         className={"action-wrapper action-btns"}
         style={{
           alignItems: "center",
-          bottom: "20px",
+          bottom: isMobile ? '40px' : '20px',
           display: "flex",
           left: "15px",
           position: "absolute",
@@ -238,8 +391,7 @@ const ResponsiveGrid = () => {
       >
         {characterStateIcon[characterState]}
         {characterStateBits[characterState]}
-
-        {/* <button
+         {/* <button
           id="mute-icon"
           color="primary"
           className="un-mute mat-focus-indicator microphone mat-fab mat-button-base mat-primary"
@@ -278,20 +430,34 @@ const ResponsiveGrid = () => {
         </button> */}
 
         <div className="form-container">
-          <TextField
-            id="outlined-basic"
-            label="Type your question here .. "
-            variant="outlined"
-            value={inputValue}
-            onChange={handleChange}
-            style={{ width: "500px" }}
-          />
-          <Button
-            type="submit"
-            variant="outlined"
-            style={{ padding: "19px 15px", border: "2px solid #fff" }}
-            onClick={handleInput}
-          >
+        
+        
+    <form
+        onSubmit={(e) => {
+        handleInput(e)    
+       }}
+    >
+    <TextField
+
+        id="outlined-basic"
+        label="Type your question here .. "
+        variant="outlined"
+        value={inputValue}
+        onChange={handleChange}
+        style={{ width: "500px",
+        height:"4px" 
+         
+      }}
+    />
+
+    <Button
+        type="submit"
+        variant="outlined"
+        style={{ padding: "19px 15px", border: "2px solid #fff",
+       }}
+        onClick={handleInput}
+    >
+ 
             <svg
               xmlns="http://www.w3.org/2000/svg"
               height="1em"
@@ -301,6 +467,7 @@ const ResponsiveGrid = () => {
               <path d="M438.6 278.6c12.5-12.5 12.5-32.8 0-45.3l-160-160c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L338.8 224 32 224c-17.7 0-32 14.3-32 32s14.3 32 32 32l306.7 0L233.4 393.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0l160-160z" />
             </svg>
           </Button>
+      </form>
         </div>
       </div>
       <TranscriptModalDialog
