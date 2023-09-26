@@ -25,6 +25,7 @@ const ResponsiveGrid = () => {
   } = useSpeechRecognition();
 
   const userEmail = localStorage.getItem("email");
+  const mainURL="https://api.polyverse.app"
   const [messages, setMessages] = useState<Array<{ type: string, content: string }>>([]);
   const { convert, setOnProcessCallback, volumeDown, volumeUp } =
     useTextToSpeech();
@@ -88,7 +89,7 @@ const ResponsiveGrid = () => {
 
 
   const sendPostRequest = (userEmail, transcription, result) => {
-    return fetch("http://127.0.0.1:8000/api/conversations/", {
+    return fetch(`${mainURL}/api/conversations/`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
