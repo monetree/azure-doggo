@@ -308,9 +308,9 @@ const ResponsiveGrid = () => {
 
       </div>
       {
-      isVisible &&
-      <div style={{
-           width: '100%',
+    isVisible ? (
+        <div style={{
+            width: '100%',
             maxWidth: isMobile ? '90%' : '500px',
             maxHeight:isMobile ? '40%' :'auto',
             overflowY: 'auto',
@@ -325,60 +325,117 @@ const ResponsiveGrid = () => {
             zIndex: 1000,
             boxShadow: isMobile ? '0px 0px 15px rgba(0, 0, 0, 0.15)' : 'none',
         }}>
-           
-
-          {messages.map((message, index) => (
-            <div key={index} style={{
-              display: 'flex',
-              justifyContent: message.type === 'You' ? 'flex-end' : 'flex-start',
-              margin: '10px 0'
-            }}>
-        <div style={{ 
-            display: 'flex',
-            flexDirection: 'column',
-            maxWidth: '100%'  
-        }}>
-            <div style={{
-              fontWeight: 'bold',
-              marginBottom: '5px',
-              color:'blue',
-            }}>
-                {message.type}
-            </div>
-            <div style={{
-              padding: '20px',
-              borderRadius: '10px',
-              backgroundColor: message.type === 'You' ? '#E9EBF8' : '#D4E6A6',
-              color: 'black'
-            }}>
-                <div>{message.content}</div>
-            </div>
+            {messages.map((message, index) => (
+                <div key={index} style={{
+                    display: 'flex',
+                    justifyContent: message.type === 'You' ? 'flex-end' : 'flex-start',
+                    margin: '10px 0'
+                }}>
+                    <div style={{ 
+                        display: 'flex',
+                        flexDirection: 'column',
+                        maxWidth: '100%'  
+                    }}>
+                        <div style={{
+                            fontWeight: 'bold',
+                            marginBottom: '5px',
+                            color: 'blue',
+                        }}>
+                            {message.type}
+                        </div>
+                        <div style={{
+                            padding: '20px',
+                            borderRadius: '10px',
+                            backgroundColor: message.type === 'You' ? '#E9EBF8' : '#D4E6A6',
+                            color: 'black'
+                        }}>
+                            <div>{message.content}</div>
+                        </div>
+                    </div>
+                </div>
+            ))}
+            {messages.length > 0 && 
+                <button 
+    style={{
+        position: 'fixed', 
+        bottom: '70px', 
+        right: '10px', 
+        background: '#FFB6C1',
+        color: 'white', 
+        border: 'none', 
+        borderRadius: '50%',
+        cursor: 'pointer',
+        fontSize: '20px',
+        width: '50px',
+        height: '50px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        boxShadow: '0px 3px 15px rgba(0, 0, 0, 0.2)',
+    }}
+    onClick={() => setIsVisible(false)}
+>
+    <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="24"
+        height="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="#FFFFFF"
+        strokeWidth="2.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+    >
+        <circle cx="12" cy="12" r="10"></circle>  {/* Circle outline */}
+        <path d="M7 7l10 10M17 7L7 17"></path>  {/* Simple 'X' mark */}
+    </svg>
+</button>
+      
+            }
+            <div ref={messagesEndRef}></div>
         </div>
-        {
-          messages.length > 0 && 
-          <button 
-              style={{
-                  position: 'fixed', 
-                  bottom: '70px', 
-                  right: '10px', 
-                  background: 'blue', 
-                  color: 'white', 
-                  border: 'none', 
-                  borderRadius: '50%',
-                  cursor: 'pointer',
-                  fontSize:'20px'
-              }}
-              onClick={() => setIsVisible(false)}
-          >
-              X
-          </button>
-        }
-    </div>
-))}
- <div ref={messagesEndRef}></div>
+    ) : (
+      <button 
+    style={{
+        position: 'fixed', 
+        bottom: '70px', 
+        right: '10px', 
+        background: '#5ec5ff', 
+        color: 'white', 
+        border: 'none', 
+        borderRadius: '50%',
+        cursor: 'pointer',
+        fontSize: '20px',
+        width: '50px',  // Set explicit width and height for consistency
+        height: '50px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        boxShadow: '0px 3px 15px rgba(0, 0, 0, 0.2)',  // Gentle shadow
+    }}
+    onClick={() => setIsVisible(true)}
+>
+    <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="24"
+        height="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="#FFFFFF"  // White stroke color
+        strokeWidth="2.5"  // Slightly bolder stroke for visibility
+        strokeLinecap="round"
+        strokeLinejoin="round"
+    >
+        <path d="M3 4h18v12H5.7L3 21v-3H3z"></path>
+        <circle cx="8" cy="10" r="1"></circle>
+        <circle cx="12" cy="10" r="1"></circle>
+        <circle cx="16" cy="10" r="1"></circle>
+    </svg>
+</button>
 
-</div>
+    )
 }
+
       <div
         className={"action-wrapper action-btns"}
         style={{
