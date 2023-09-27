@@ -312,25 +312,25 @@ const ResponsiveGrid = () => {
     isVisible ? (
         <div style={{
             width: '100%',
-            maxWidth: isMobile ? '90%' : '500px',
+            maxWidth: isMobile ? '70%' : '400px',
             maxHeight:isMobile ? '40%' :'auto',
-            overflowY: 'auto',
+            overflowY: 'scroll',
+            scrollbarWidth: 'none',  
             position: isMobile ? 'fixed' : 'absolute',
-            right: '5px',
+            right: '55px',
             left:isMobile ? '90':'auto',
-            bottom: isMobile ? '95px' : '80px',
+            bottom: isMobile ? '103px' : '80px',
             top: isMobile ? '350px' : '100px',
             display: 'flex',
             flexDirection: 'column',
             justifyContent: 'center',
             zIndex: 1000,
-            boxShadow: isMobile ? '0px 0px 15px rgba(0, 0, 0, 0.15)' : 'none',
         }}>
             {messages.map((message, index) => (
                 <div key={index} style={{
                     display: 'flex',
                     justifyContent: message.type === 'You' ? 'flex-end' : 'flex-start',
-                    margin: '10px 0'
+                    margin: isMobile?'2px 0':'10px 0'
                 }}>
                     <div style={{ 
                         display: 'flex',
@@ -339,16 +339,23 @@ const ResponsiveGrid = () => {
                     }}>
                         <div style={{
                             fontWeight: 'bold',
-                            marginBottom: '5px',
-                            color: 'blue',
+                            marginBottom: isMobile?'2px':'5px',
+                            color: 'white',
+                            textAlign: message.type==='You'? 'left':'right',
+                            font:'exo',
+                            fontSize:'10px',
                         }}>
                             {message.type}
                         </div>
                         <div style={{
-                            padding: '20px',
-                            borderRadius: '10px',
-                            backgroundColor: message.type === 'You' ? '#E9EBF8' : '#D4E6A6',
-                            color: 'black'
+                            padding: isMobile?'10px':'30px',
+                            borderRadius: '20px 20px 20px 0px',
+                            backgroundColor: message.type === 'You' ? '#E9EBF8' : '#2c2c2c',
+                            filter: message.type === 'You' ? 'none' : 'brightness(1.4)',
+                            color: message.type === 'You' ? 'black' : 'white',
+                            lineHeight: isMobile?'20px':'27px',
+                            margin:'0px',
+
                         }}>
                             <div>{message.content}</div>
                         </div>
@@ -356,54 +363,64 @@ const ResponsiveGrid = () => {
                 </div>
             ))}
             {messages.length > 0 && 
-                <button 
-    style={{
-        position: 'fixed', 
-        bottom: '70px', 
-        right: '10px', 
-        background: '#FFB6C1',
-        color: 'white', 
-        border: 'none', 
-        borderRadius: '50%',
-        cursor: 'pointer',
-        fontSize: '20px',
-        width: '50px',
-        height: '50px',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        boxShadow: '0px 3px 15px rgba(0, 0, 0, 0.2)',
-    }}
-    onClick={() => setIsVisible(false)}
->
-    <svg
-        xmlns="http://www.w3.org/2000/svg"
-        width="24"
-        height="24"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="#FFFFFF"
-        strokeWidth="2.5"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-    >
-        <circle cx="12" cy="12" r="10"></circle>  {/* Circle outline */}
-        <path d="M7 7l10 10M17 7L7 17"></path>  {/* Simple 'X' mark */}
-    </svg>
-</button>
+            <button 
+            style={{
+                position: 'fixed', 
+                bottom: isMobile ? '50px' : '20px', 
+                right: '20px', 
+                background: "#10c1cb",
+                color: 'white', 
+                border: 'none', 
+                borderRadius: '50%',
+                cursor: 'pointer',
+                fontSize: '20px',
+                width: '50px',
+                height: '50px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                boxShadow: '0px 3px 15px rgba(0, 0, 0, 0.2)',
+            }}
+            onMouseOver={(e) => e.currentTarget.style.background = '#38ACEC'} 
+            onMouseOut={(e) => e.currentTarget.style.background = '#10c1cb'}   
+            onClick={() => setIsVisible(false)}
+        >
+            <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="30"
+                height="40"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="white"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+            >
+        <path d="M6 6l12 12M18 6L6 18"></path>  
+            </svg>
+        </button>
+        
       
             }
             <div ref={messagesEndRef}></div>
+            <style>
+        {`
+            div::-webkit-scrollbar {
+                display: none;
+            }
+        `}
+    </style>
         </div>
     ) : (
       <button 
     style={{
         position: 'fixed', 
-        bottom: '70px', 
-        right: '10px', 
-        background: '#5ec5ff', 
+        bottom: isMobile ?'50px':'20px', 
+        right: isMobile? '20px': '20px', 
+
+        background: '#10c1cb', 
         color: 'white', 
-        border: 'none', 
+        border: 'none',
         borderRadius: '50%',
         cursor: 'pointer',
         fontSize: '20px',
@@ -414,6 +431,8 @@ const ResponsiveGrid = () => {
         justifyContent: 'center',
         boxShadow: '0px 3px 15px rgba(0, 0, 0, 0.2)',  // Gentle shadow
     }}
+    onMouseOver={(e) => e.currentTarget.style.background = '#38ACEC'} 
+    onMouseOut={(e) => e.currentTarget.style.background = '#10c1cb'}
     onClick={() => setIsVisible(true)}
 >
     <svg
@@ -441,7 +460,7 @@ const ResponsiveGrid = () => {
         className={"action-wrapper action-btns"}
         style={{
           alignItems: "center",
-          bottom: isMobile ? '40px' : '20px',
+          bottom: isMobile ? '47px' : '20px',
           display: "flex",
           left: "15px",
           position: "absolute",
