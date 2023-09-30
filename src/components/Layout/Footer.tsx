@@ -25,7 +25,7 @@ const ResponsiveGrid = () => {
   } = useSpeechRecognition();
 
   const userEmail = localStorage.getItem("email");
-  const mainURL="https://api.polyverse.app"
+  const mainURL="https://api.avatarx.live"
   const [messages, setMessages] = useState<Array<{ type: string, content: string }>>([]);
   const { convert, setOnProcessCallback, volumeDown, volumeUp } =
     useTextToSpeech();

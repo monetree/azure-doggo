@@ -168,7 +168,6 @@ const useSpeechRecognition = () => {
       analyser.current.fftSize = 32;
       const bufferLength = analyser.current.frequencyBinCount;
       const dataArray = new Uint8Array(bufferLength);
-
       analyser.current.getByteFrequencyData(dataArray);
 
       const avgVolume =
