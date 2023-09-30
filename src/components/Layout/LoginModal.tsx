@@ -17,7 +17,7 @@ export default function LoginModalDialog({ open, setOpen }: ModalDialogProps) {
 
   const getEmails = () => {
     axios
-      .get(`https://api.polyverse.app/api/whitelisted-emails/`, {
+      .get(`https://api.avatarx.live/api/whitelisted-emails/`, {
         headers: {
           Accept: "application/json",
         },
