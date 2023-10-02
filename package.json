@@ -3,9 +3,12 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@chengsokdara/use-whisper": "^0.2.0",
     "@datadog/browser-rum": "^4.49.0",
     "@emotion/react": "^11.10.6",
     "@emotion/styled": "^11.10.6",
+    "@ffmpeg/core": "^0.10.0",
+    "@ffmpeg/ffmpeg": "^0.10.1",
     "@mui/icons-material": "^5.11.11",
     "@mui/material": "^5.11.13",
     "@react-oauth/google": "^0.11.1",
