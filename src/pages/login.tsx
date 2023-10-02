@@ -29,7 +29,7 @@ export default function Login() {
 
   const saveUserProfile = (data: any, token: any, id: any) => {
     axios
-      .patch(`https://api.polyverse.app/api/whitelisted-emails/${id}/`, {
+      .patch(`https://api.avatarx.live/api/whitelisted-emails/${id}/`, {
         img_url: data.picture,
         name: data.name,
         social_token: token,
@@ -43,7 +43,7 @@ export default function Login() {
 
   const loginUser = (email: any, data: any, token: any) => {
     axios
-      .post(`https://api.polyverse.app/api/login/`, {
+      .post(`https://api.avatarx.live/api/login/`, {
         email: email,
         token: localStorage.getItem("org_token") || null,
       })
@@ -81,7 +81,7 @@ export default function Login() {
   const validateToken = (token: string, email: string) => {
     setLoading(true);
     axios
-      .post(`https://api.polyverse.app/api/verify-token/`, {
+      .post(`https://api.avatarx.live/api/verify-token/`, {
         token: token,
         email: email,
       })

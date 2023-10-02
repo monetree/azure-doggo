@@ -65,7 +65,7 @@ function ResponsiveAppBar() {
   const getUser = () => {
     const id = localStorage.getItem("id");
     axios
-      .get(`https://api.polyverse.app/api/whitelisted-emails/${id}/`)
+      .get(`https://api.avatarx.live/api/whitelisted-emails/${id}/`)
       .then((res) => {
         setProfile(res.data);
       })
