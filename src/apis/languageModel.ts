@@ -21,7 +21,15 @@ import {
   LANGUAGE_MODEL_API_KEY,
   LANGUAGE_MODEL_URL,
 } from "../context/constants";
-
+import { ConversationChain } from "langchain/chains";
+import { ChatOpenAI } from "langchain/chat_models/openai";
+import {
+  ChatPromptTemplate,
+  HumanMessagePromptTemplate,
+  SystemMessagePromptTemplate,
+  MessagesPlaceholder,
+} from "langchain/prompts";
+import { BufferMemory } from "langchain/memory";
 /**
  * Represents a message object with an author and content.
  * @interface
@@ -77,6 +85,11 @@ type LanguageModel = {
   sendMessage: (message: string) => Promise<string>;
 };
 
+const memory = new BufferMemory({
+  returnMessages: true,
+  memoryKey: "history",
+});
+
 const useLanguageModel = (): LanguageModel => {
   const config = useContext(ConfigContext);
 
@@ -84,54 +97,44 @@ const useLanguageModel = (): LanguageModel => {
   let messages: MessageProps[] = [];
   let prevResponse = "";
 
-  const sendPrompt = async (payload: any) => {
-    var myHeaders = new Headers();
-    myHeaders.append("Authorization", `Bearer ${LANGUAGE_MODEL_API_KEY}`);
-    myHeaders.append("Content-Type", "application/json");
-    const response = await fetch(LANGUAGE_MODEL_URL, {
-      headers: myHeaders,
-      body: JSON.stringify(payload),
-      method: "POST",
+  // Langchain variables
+  const api_key = process.env.REACT_APP_OPENAI_API_KEY;
+
+  const chat = new ChatOpenAI({ openAIApiKey: api_key, temperature: 0 });
+  const chatPrompt = ChatPromptTemplate.fromPromptMessages([
+    SystemMessagePromptTemplate.fromTemplate(
+      `You are a very smart and funny teacher. Your task is 
+      to acting as a teacher for various subjects. 
+      Please give precise answers for the questions you are asked. 
+      Don't make it more than 30 words.`
+    ),
+    new MessagesPlaceholder("history"),
+    HumanMessagePromptTemplate.fromTemplate("{input}"),
+  ]);
+
+  // Return the current conversation directly as messages and insert them into the MessagesPlaceholder in the above prompt.
+
+  const chain = new ConversationChain({
+    memory: memory,
+    prompt: chatPrompt,
+    llm: chat,
+    // verbose: true,
+  });
+
+  const sendPrompt = async (human_message: string) => {
+    const result = await chain.call({
+      input: human_message,
     });
-    return response.json();
+    return result;
   };
 
   useEffect(() => {
     context = `Your task is to acting as a character that has this personality: "${config.state.personality}". Your response must be based on your personality. You have this backstory: "${config.state.backStory}". Your knowledge base is: "${config.state.knowledgeBase}". The response should be one single sentence only.`;
   }, [config]);
 
-  const sendMessage = async (message: string): Promise<string> => {
-    const messages = [
-      {
-        role: "system",
-        content: "Act as a virtual teacher. Answer question in 30 words",
-      },
-      {
-        role: "user",
-        content: message,
-      },
-    ];
-
-    console.log("prevResponse", prevResponse);
-    if (prevResponse) {
-      messages.push({
-        role: "assistant",
-        content: prevResponse,
-      });
-    }
-
-    console.log(messages);
-
-    const payload = {
-      model: "gpt-3.5-turbo",
-      // model: "gpt-4-0314",
-      messages: messages,
-    };
-
-    const response = await sendPrompt(payload);
-    const content = response.choices[0].message.content;
-    prevResponse = content;
-    return content;
+  const sendMessage = async (human_message: string): Promise<string> => {
+    const response = await sendPrompt(human_message);
+    return response.response;
   };
 
   return {
