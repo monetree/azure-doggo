@@ -292,38 +292,50 @@ const ResponsiveGrid = () => {
     <div>
       <div className="form-container-sm">
       <div style={{
-      position: 'fixed',
-      bottom: '3px',
-      left: '1px',
-      right: '1px',
-      display: 'flex',
-    }}>
-      <form
-        onSubmit={handleInput}
-        style={{
-          flex: '0 0 100%',
-        }}
-      >
+                position: 'fixed',
+                bottom: '3px',
+                left: '1px',
+                right: '1px',
+                display: 'flex',
+                alignItems: 'center', 
+                }}>
+          <form
+            onSubmit={(e) => {
+                handleInput(e)
+            }}
+            style={{
+                flex: '0 0 85%', 
+            }}
+          >
         <TextField
           id="outlined-basic"
           label="Type your question here .. "
           variant="outlined"
-          size="small"
-          fullWidth
+          size="small" 
           value={inputValue}
           onChange={handleChange}
-          InputProps={{
-            endAdornment: (
-              <InputAdornment position="end">
-                <IconButton onClick={handleInput} edge="end">
-                  <MdSend size={20} />
-                </IconButton>
-              </InputAdornment>
-            ),
-          }}
         />
-      </form>
-    </div>
+    </form>
+      <Button
+        type="submit"
+        variant="outlined"
+        style={{
+            minWidth: '5px', 
+            border: "1px solid #fff",
+        }}
+        onClick={handleInput}
+    >
+        <svg
+            xmlns="http://www.w3.org/2000/svg"
+            height="2em"
+            width='2em'
+            viewBox="0 0 448 512"
+            fill="#fff"
+        >
+            <path d="M438.6 278.6c12.5-12.5 12.5-32.8 0-45.3l-160-160c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L338.8 224 32 224c-17.7 0-32 14.3-32 32s14.3 32 32 32l306.7 0L233.4 393.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0l160-160z" />
+        </svg>
+    </Button>
+</div>
 
 
       </div>
@@ -499,6 +511,9 @@ style={{
           borderRadius: '10px',
 
         }}
+        onClick={() =>{
+          triggerHandleInput(question);
+          }}
         onMouseOver={(e) =>setHoveredIdx(idx)}
         onMouseOut={(e) => setHoveredIdx(null)}
         onTouchStart={() => setTouchedIdx(idx)}
@@ -513,9 +528,7 @@ style={{
                 float:'right' 
             
             }}
-              onClick={() =>{
-                triggerHandleInput(question);
-                }}
+             
             />
           )}
         </button>
