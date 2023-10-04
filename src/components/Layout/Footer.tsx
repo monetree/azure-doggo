@@ -28,6 +28,8 @@ const ResponsiveGrid = () => {
     stopRecording,
     setOnSpeechFoundCallback,
   } = useSpeechRecognition();
+  
+  const shouldHandleInputRef = useRef<boolean>(false);
   const [response, setResponse] = useState("");
   const userEmail = localStorage.getItem("email");
   const mainURL="https://api.avatarx.live"
@@ -162,6 +164,23 @@ const ResponsiveGrid = () => {
     });
   };
 
+
+  useEffect(() => {
+    if (shouldHandleInputRef.current) {
+      const simulatedEvent = {
+        preventDefault: () => {},
+      } as any;
+      handleInput(simulatedEvent);
+      shouldHandleInputRef.current = false; // Reset the ref value after handling
+    }
+  }, [inputValue]);
+  
+  const triggerHandleInput = (value: string) => {
+      console.log(value);
+      setInputValue(value);
+      shouldHandleInputRef.current = true; // Indicate that the next change should trigger handleInput
+  };
+ 
   const characterStateIcon = {
     [CharacterState.Idle]: (
       <button
@@ -494,7 +513,9 @@ style={{
                 float:'right' 
             
             }}
-              // onClick={() => handleQuestionClick(question)}
+              onClick={() =>{
+                triggerHandleInput(question);
+                }}
             />
           )}
         </button>
