@@ -15,8 +15,9 @@
  */
 
 import { useEffect, useRef, useState } from "react";
+import { useWhisper } from '@chengsokdara/use-whisper'
 
-import { GOOGLE_CLOUD_API_KEY } from "../context/constants";
+import { GOOGLE_CLOUD_API_KEY, LANGUAGE_MODEL_API_KEY } from "../context/constants";
 
 import { sendRequestToGoogleCloudApi } from "./network";
 import * as talkingHead from "./talkingHead";
@@ -50,22 +51,67 @@ const useSpeechRecognition = () => {
   const source = useRef<MediaStreamAudioSourceNode | null>(null);
   const bars = useRef<(HTMLDivElement | null)[]>([]);
 
+
+  const [conversationStarted, setConversationStarted] = useState(false)
+
+  const {
+    recording,
+    speaking,
+    transcribing,
+    transcript,
+    pauseRecording,
+    startRecording,
+    stopRecording,
+  } = useWhisper({
+    apiKey: LANGUAGE_MODEL_API_KEY, // YOUR_OPEN_AI_TOKEN
+  })
+
+
+
+  useEffect(() => {
+    if(speaking){
+      setConversationStarted(true)
+    }
+  },[speaking])
+
+  useEffect(() => {
+    if(conversationStarted && !speaking){
+      console.log(recording)
+      stopRecording() 
+    }
+
+  },[conversationStarted, speaking])
+
+
+
+
   const setOnSpeechFoundCallback = (callback: SpeechFoundCallback) => {
     onSpeechFoundCallback.current = callback;
   };
 
-  (async () => {
-    try {
-      stream.current = await navigator.mediaDevices.getUserMedia({
-        audio: true,
-      });
-      // ... other setup code here
-    } catch (err) {
-      console.error("Error accessing media devices.", err);
-    }
-  })();
 
-  const startRecording = async () => {
+  useEffect(() => {
+    if(transcript && transcript.text){
+      onSpeechFoundCallback.current(transcript.text);
+      startRecording()
+    }
+  },[transcript])
+
+  
+
+  // (async () => {
+  //   try {
+  //     stream.current = await navigator.mediaDevices.getUserMedia({
+  //       audio: true,
+  //     });
+  //     // ... other setup code here
+  //   } catch (err) {
+  //     console.error("Error accessing media devices.", err);
+  //   }
+  // })();
+
+
+  const startRecordingDep = async () => {
     try {
       // stream.current = await navigator.mediaDevices.getUserMedia({
       //   audio: true,
@@ -92,7 +138,7 @@ const useSpeechRecognition = () => {
     }
   };
 
-  const stopRecording = async () => {
+  const stopRecordingDep = async () => {
     if (stream.current) {
       stream.current.getTracks().forEach((track) => track.stop());
     }
@@ -152,7 +198,7 @@ const useSpeechRecognition = () => {
       const last_1 = volumes[volumes.length - 1];
       const last_2 = volumes[volumes.length - 2];
       if (!last_1 && !last_2) {
-        answerNow();
+        stopRecording();
         setVolumes([]);
       }
     }
@@ -269,7 +315,6 @@ const useSpeechRecognition = () => {
 
   const recognize = async (audioString: string) => {
     const voice = sessionStorage.getItem("voice") || null;
-
     await sendRequestToGoogleCloudApi(
       "https://speech.googleapis.com/v1p1beta1/speech:recognize",
       {
@@ -297,9 +342,12 @@ const useSpeechRecognition = () => {
   const onMicButtonPressed = () => {
     if (characterState === CharacterState.Idle) {
       startRecording();
+      setCharacterState(CharacterState.Listening);
     } else if (characterState === CharacterState.Listening) {
       stopRecording();
+      setCharacterState(CharacterState.Idle);
     }
+    
   };
 
   return {
@@ -308,8 +356,8 @@ const useSpeechRecognition = () => {
     setCharacterState,
     onMicButtonPressed,
     setOnSpeechFoundCallback,
-    startRecording,
-    stopRecording,
+    startRecordingDep,
+    stopRecordingDep,
   };
 };
 

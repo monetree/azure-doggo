@@ -19,8 +19,8 @@ const ResponsiveGrid = () => {
     bars,
     setCharacterState,
     onMicButtonPressed,
-    startRecording,
-    stopRecording,
+    // startRecording,
+    // stopRecording,
     setOnSpeechFoundCallback,
   } = useSpeechRecognition();
 
@@ -59,6 +59,7 @@ const ResponsiveGrid = () => {
   }, [messages]);
   
 
+  
   useEffect(() => {
     setOnProcessCallback((audioData: Float32Array) => {
       talkingHead.registerCallback(audioData);

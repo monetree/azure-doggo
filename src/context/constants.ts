@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+
 export const GOOGLE_CLOUD_API_KEY = "AIzaSyDFpK8EXyWLN2PY0hqIPa6Z2KLadkciVlE"; // Fill in your API key
 
 export const LANGUAGE_MODEL_API_KEY =
