@@ -63,6 +63,7 @@ const useSpeechRecognition = () => {
 
   useEffect(() => {
     if(transcript && transcript.text){
+      console.log(transcript.text)
       onSpeechFoundCallback.current(transcript.text);
       startRecording()
     }
