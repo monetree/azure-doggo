@@ -6,8 +6,13 @@ import { useEffect, useRef, useState } from "react";
 import useTextToSpeech from "../../apis/textToSpeech";
 import * as talkingHead from "../../apis/talkingHead";
 import TextField from "@mui/material/TextField";
+import IconButton from '@mui/material/IconButton';
+import InputAdornment from '@mui/material/InputAdornment';
 import TranscriptModalDialog from "./transcriptModal";
 import { Button } from "@mui/material";
+import { MdSend } from 'react-icons/md'; 
+
+
 
 interface ChildComponentProps {
   transcript: string;
@@ -19,11 +24,13 @@ const ResponsiveGrid = () => {
     bars,
     setCharacterState,
     onMicButtonPressed,
-    // startRecording,
-    // stopRecording,
+    startRecording,
+    stopRecording,
     setOnSpeechFoundCallback,
   } = useSpeechRecognition();
-
+  
+  const shouldHandleInputRef = useRef<boolean>(false);
+  const [response, setResponse] = useState("");
   const userEmail = localStorage.getItem("email");
   const mainURL="https://api.avatarx.live"
   const [messages, setMessages] = useState<Array<{ type: string, content: string }>>([]);
@@ -42,6 +49,13 @@ const ResponsiveGrid = () => {
   const [inputValue, setInputValue] = useState("");
   const [open, setOpen] = useState(false);
   const [volumeDownState, setVolumeDownState] = useState(false);
+  const [hoveredIdx, setHoveredIdx] = useState(null);
+  const [touchedIdx, setTouchedIdx] = useState(null);
+  const sampleQuestions = [
+    "Learn English - Basic",
+    "Learn English - Intermediate",
+    "Learn English - Advanced"
+  ];
 
   const handleChange = (event: any) => {
     setInputValue(event.target.value);
@@ -59,7 +73,6 @@ const ResponsiveGrid = () => {
   }, [messages]);
   
 
-  
   useEffect(() => {
     setOnProcessCallback((audioData: Float32Array) => {
       talkingHead.registerCallback(audioData);
@@ -151,6 +164,23 @@ const ResponsiveGrid = () => {
     });
   };
 
+
+  useEffect(() => {
+    if (shouldHandleInputRef.current) {
+      const simulatedEvent = {
+        preventDefault: () => {},
+      } as any;
+      handleInput(simulatedEvent);
+      shouldHandleInputRef.current = false; // Reset the ref value after handling
+    }
+  }, [inputValue]);
+  
+  const triggerHandleInput = (value: string) => {
+      console.log(value);
+      setInputValue(value);
+      shouldHandleInputRef.current = true; // Indicate that the next change should trigger handleInput
+  };
+ 
   const characterStateIcon = {
     [CharacterState.Idle]: (
       <button
@@ -412,6 +442,8 @@ const ResponsiveGrid = () => {
         `}
     </style>
         </div>
+
+        
     ) : (
       <button 
     style={{
@@ -456,6 +488,54 @@ const ResponsiveGrid = () => {
 
     )
 }
+
+<div>
+{messages.length == 0 && 
+<div
+style={{
+  marginLeft:isMobile?'0px':'350px',
+  textAlign:isMobile?'center':'left',
+  alignContent:'center',
+  marginRight:isMobile?'0px':'250px'
+}}>
+{sampleQuestions.map((question, idx) => (
+        <button  key={idx} 
+        // onClick={() => handleQuestionClick(question)}
+        style={{
+          margin:isMobile?'2px 0px':'5px 10px',
+          width:isMobile?'200px':'250px',
+          height:isMobile?'35px':'50px',
+          backgroundColor: hoveredIdx === idx || touchedIdx === idx ? '#454545' : '#1b1d23',
+          border:'1px solid #454545',
+          color:'white',
+          borderRadius: '10px',
+
+        }}
+        onClick={() =>{
+          triggerHandleInput(question);
+          }}
+        onMouseOver={(e) =>setHoveredIdx(idx)}
+        onMouseOut={(e) => setHoveredIdx(null)}
+        onTouchStart={() => setTouchedIdx(idx)}
+        onTouchEnd={() => setTouchedIdx(null)}
+        >
+          {question}
+          {hoveredIdx === idx && (
+            <MdSend
+              size={15}
+              style={{ 
+                cursor: 'pointer',
+                float:'right' 
+            
+            }}
+             
+            />
+          )}
+        </button>
+      ))}
+      </div>
+      }
+      </div>
 
       <div
         className={"action-wrapper action-btns"}
@@ -523,28 +603,24 @@ const ResponsiveGrid = () => {
         value={inputValue}
         onChange={handleChange}
         style={{ width: "500px",
-        height:"4px" 
+        height:"4px",}}
+        InputProps={{
+          endAdornment: (
+            <InputAdornment position="end">
+              <IconButton 
+              onClick={handleInput} 
+              edge="end">
+                <MdSend size={20} />
+              </IconButton>
+            </InputAdornment>
+          ),
+        }}
          
-      }}
+    
     />
+    
 
-    <Button
-        type="submit"
-        variant="outlined"
-        style={{ padding: "19px 15px", border: "2px solid #fff",
-       }}
-        onClick={handleInput}
-    >
- 
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              height="1em"
-              viewBox="0 0 448 512"
-              fill="#fff"
-            >
-              <path d="M438.6 278.6c12.5-12.5 12.5-32.8 0-45.3l-160-160c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L338.8 224 32 224c-17.7 0-32 14.3-32 32s14.3 32 32 32l306.7 0L233.4 393.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0l160-160z" />
-            </svg>
-          </Button>
+    
       </form>
         </div>
       </div>

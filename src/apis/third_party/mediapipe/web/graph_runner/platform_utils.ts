@@ -1,5 +1,5 @@
 /**
- * Copyright 2023 Google LLC
+ * Copyright 2023 The MediaPipe Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,15 +14,10 @@
  * limitations under the License.
  */
 
-export const GOOGLE_CLOUD_API_KEY = "AIzaSyDFpK8EXyWLN2PY0hqIPa6Z2KLadkciVlE"; // Fill in your API key
-
-export const LANGUAGE_MODEL_API_KEY =
-  "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"; // Fill in your API key
-
-export const OPENAI_API_KEY =
-"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"; // Fill in your API key
-
-export const LANGUAGE_MODEL_BASE_URL =
-  "https://autopush-generativelanguage.sandbox.googleapis.com";
-
-export const LANGUAGE_MODEL_URL = `https://api.openai.com/v1/chat/completions`;
+/** Returns whether the underlying rendering engine is WebKit. */
+export function isWebKit(browser = navigator) {
+  const userAgent = browser.userAgent;
+  // Note that this returns true for Chrome on iOS (which is running WebKit) as
+  // it uses "CriOS".
+  return userAgent.includes('Safari') && !userAgent.includes('Chrome');
+}

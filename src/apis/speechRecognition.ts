@@ -15,12 +15,12 @@
  */
 
 import { useEffect, useRef, useState } from "react";
-import { useWhisper } from '@chengsokdara/use-whisper'
 
-import { GOOGLE_CLOUD_API_KEY, LANGUAGE_MODEL_API_KEY } from "../context/constants";
+import { GOOGLE_CLOUD_API_KEY } from "../context/constants";
 
 import { sendRequestToGoogleCloudApi } from "./network";
 import * as talkingHead from "./talkingHead";
+import { useWhisper } from '@chengsokdara/use-whisper'
 
 interface SpeechFoundCallback {
   (text: string): void;
@@ -50,10 +50,7 @@ const useSpeechRecognition = () => {
   let stream = useRef<MediaStream | null>(null);
   const source = useRef<MediaStreamAudioSourceNode | null>(null);
   const bars = useRef<(HTMLDivElement | null)[]>([]);
-
-
-  const [conversationStarted, setConversationStarted] = useState(false)
-
+  
   const {
     recording,
     speaking,
@@ -63,100 +60,20 @@ const useSpeechRecognition = () => {
     startRecording,
     stopRecording,
   } = useWhisper({
-    apiKey: LANGUAGE_MODEL_API_KEY, // YOUR_OPEN_AI_TOKEN
+    apiKey: process.env.REACT_APP_OPENAI_API_KEY,
+        
   })
-
-
-
-  useEffect(() => {
-    if(speaking){
-      setConversationStarted(true)
-    }
-  },[speaking])
-
-  useEffect(() => {
-    if(conversationStarted && !speaking){
-      console.log(recording)
-      stopRecording() 
-    }
-
-  },[conversationStarted, speaking])
-
-
+  const previousTranscriptRef = useRef(transcript);
 
 
   const setOnSpeechFoundCallback = (callback: SpeechFoundCallback) => {
     onSpeechFoundCallback.current = callback;
   };
 
-
+ 
   useEffect(() => {
-    if(transcript && transcript.text){
-      onSpeechFoundCallback.current(transcript.text);
-      startRecording()
-    }
-  },[transcript])
-
-  
-
-  // (async () => {
-  //   try {
-  //     stream.current = await navigator.mediaDevices.getUserMedia({
-  //       audio: true,
-  //     });
-  //     // ... other setup code here
-  //   } catch (err) {
-  //     console.error("Error accessing media devices.", err);
-  //   }
-  // })();
-
-
-  const startRecordingDep = async () => {
-    try {
-      // stream.current = await navigator.mediaDevices.getUserMedia({
-      //   audio: true,
-      // });
-
-      audioContext.current = new AudioContext();
-      analyser.current = audioContext.current.createAnalyser();
-      source.current = audioContext.current.createMediaStreamSource(
-        stream.current
-      );
-      source.current.connect(analyser.current);
-      mediaRecorder.current = new MediaRecorder(stream.current);
-      mediaRecorder.current.ondataavailable = (event) => {
-        if (event.data.size > 0) {
-          recordedChunks.current.push(event.data);
-        }
-      };
-
-      mediaRecorder.current.start();
-      setCharacterState(CharacterState.Listening);
-      // talkingHead.setIsThinking(true);
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
-  const stopRecordingDep = async () => {
-    if (stream.current) {
-      stream.current.getTracks().forEach((track) => track.stop());
-    }
-    if (audioContext.current) {
-      if (source.current) {
-        source.current.disconnect();
-      }
-      if (analyser.current) {
-        analyser.current.disconnect();
-      }
-      audioContext.current.close();
-    }
-    if (mediaRecorder.current) {
-      mediaRecorder.current.stop();
-      setCharacterState(CharacterState.Idle);
-      // talkingHead.setIsThinking(false);
-    }
-  };
+    // startRecording();
+}, []);
 
   const [talkStarted, setTalkStarted] = useState(false);
   const [volumes, setVolumes] = useState([]);
@@ -164,7 +81,8 @@ const useSpeechRecognition = () => {
   const answerNow = async () => {
     console.log("mediaRecorder.current", mediaRecorder.current.stream);
     if (mediaRecorder.current) {
-      mediaRecorder.current.stop();
+      await stopRecording();
+      
       await new Promise((resolve) => {
         if (mediaRecorder.current) {
           mediaRecorder.current.onstop = () => {
@@ -173,6 +91,7 @@ const useSpeechRecognition = () => {
         }
       });
 
+      
       const blob = new Blob(recordedChunks.current, { type: "audio/webm" });
       console.log("blob", blob);
       recordedChunks.current = [];
@@ -182,19 +101,26 @@ const useSpeechRecognition = () => {
         const base64Data = reader.result?.toString().split(",")[1];
         console.log("base64Data", base64Data);
         if (base64Data) {
-          await recognize(base64Data);
+          // await recognize(base64Data);
         }
 
         mediaRecorder.current.start();
       };
     }
   };
+  
+
+useEffect(()=>{
+}, [transcript])
 
   useEffect(() => {
     // let vol_ = volumes.slice(Math.max(volumes.length - 3, 0));
     const nums = volumes.filter((val) => val !== 0);
-    if (!nums.length) return;
+    if (!nums.length){ 
+
+      return;}
     if (volumes.length > 10) {
+
       const last_1 = volumes[volumes.length - 1];
       const last_2 = volumes[volumes.length - 2];
       if (!last_1 && !last_2) {
@@ -218,7 +144,6 @@ const useSpeechRecognition = () => {
 
       const avgVolume =
         dataArray.reduce((acc, val) => acc + val) / bufferLength;
-
       if (avgVolume > 50) {
         setTalkStarted(true);
         setVolumes((prevArray) => [...prevArray, 1]);
@@ -313,41 +238,50 @@ const useSpeechRecognition = () => {
     };
   }, [characterState, bars, analyser]);
 
-  const recognize = async (audioString: string) => {
-    const voice = sessionStorage.getItem("voice") || null;
-    await sendRequestToGoogleCloudApi(
-      "https://speech.googleapis.com/v1p1beta1/speech:recognize",
-      {
-        config: {
-          encoding: "WEBM_OPUS",
-          sampleRateHertz: 48000,
-          audioChannelCount: 1,
-          enableAutomaticPunctuation: true,
-          languageCode: voice ? JSON.parse(voice)["languageCodes"][0] : "en-US",
-          profanityFilter: true,
-        },
-        audio: { content: audioString },
-      },
-      GOOGLE_CLOUD_API_KEY
-    ).then((response) => {
-      if (response !== null && response.results !== undefined) {
-        const topTranscriptionAlternative = response.results[0];
-        const transcript =
-          topTranscriptionAlternative.alternatives[0].transcript;
-        onSpeechFoundCallback.current(transcript);
-      }
-    });
-  };
+  // const recognize = async (audioString: string) => {
+  //   const voice = sessionStorage.getItem("voice") || null;
 
-  const onMicButtonPressed = () => {
+  //   await sendRequestToGoogleCloudApi(
+  //     "https://speech.googleapis.com/v1p1beta1/speech:recognize",
+  //     {
+  //       config: {
+  //         encoding: "WEBM_OPUS",
+  //         sampleRateHertz: 48000,
+  //         audioChannelCount: 1,
+  //         enableAutomaticPunctuation: true,
+  //         languageCode: voice ? JSON.parse(voice)["languageCodes"][0] : "en-US",
+  //         profanityFilter: true,
+  //       },
+  //       audio: { content: audioString },
+  //     },
+  //     GOOGLE_CLOUD_API_KEY
+  //   ).then((response) => {
+  //     if (response !== null && response.results !== undefined) {
+  //       const topTranscriptionAlternative = response.results[0];
+  //       const transcript =
+  //         topTranscriptionAlternative.alternatives[0].transcript;
+  //       onSpeechFoundCallback.current(transcript);
+  //     }
+  //   });
+  // };
+  useEffect(() => {
+    if (transcript !== previousTranscriptRef.current) {
+        onSpeechFoundCallback.current(transcript.text);
+        previousTranscriptRef.current = transcript;
+    }
+    
+}, [characterState, transcript]);
+
+
+  const onMicButtonPressed = async() => {
     if (characterState === CharacterState.Idle) {
       startRecording();
       setCharacterState(CharacterState.Listening);
     } else if (characterState === CharacterState.Listening) {
+
       stopRecording();
       setCharacterState(CharacterState.Idle);
-    }
-    
+        }
   };
 
   return {
@@ -356,9 +290,9 @@ const useSpeechRecognition = () => {
     setCharacterState,
     onMicButtonPressed,
     setOnSpeechFoundCallback,
-    startRecordingDep,
-    stopRecordingDep,
+    startRecording,
+    stopRecording,
   };
 };
 
-export default useSpeechRecognition;
+export default useSpeechRecognition; 
