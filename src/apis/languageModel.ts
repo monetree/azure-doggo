@@ -14,13 +14,11 @@
  * limitations under the License.
  */
 
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect } from "react";
+
+
 
 import { ConfigContext } from "../context/config";
-import {
-  LANGUAGE_MODEL_API_KEY,
-  LANGUAGE_MODEL_URL,
-} from "../context/constants";
 import { ConversationChain } from "langchain/chains";
 import { ChatOpenAI } from "langchain/chat_models/openai";
 import {

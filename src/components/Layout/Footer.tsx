@@ -24,8 +24,6 @@ const ResponsiveGrid = () => {
     bars,
     setCharacterState,
     onMicButtonPressed,
-    startRecording,
-    stopRecording,
     setOnSpeechFoundCallback,
   } = useSpeechRecognition();
   
@@ -39,6 +37,7 @@ const ResponsiveGrid = () => {
 
   const useZepetoModel = false;
   const messagesEndRef = useRef(null);
+
 
   const { sendMessage } = useLanguageModel();
   talkingHead.runBlendshapesDemo(useZepetoModel);
