@@ -488,7 +488,8 @@ const ResponsiveGrid = () => {
     )
 }
 
-<div>
+
+{/* <div>
 {messages.length == 0 && 
 <div
 style={{
@@ -534,7 +535,7 @@ style={{
       ))}
       </div>
       }
-      </div>
+      </div> */}
 
       <div
         className={"action-wrapper action-btns"}
