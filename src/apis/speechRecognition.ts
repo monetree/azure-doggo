@@ -1,6 +1,5 @@
 
 import { useEffect, useRef, useState } from "react";
-import * as talkingHead from "./talkingHead";
 import { useWhisper } from '@chengsokdara/use-whisper'
 
 interface SpeechFoundCallback {
@@ -23,13 +22,8 @@ const useSpeechRecognition = () => {
   const [characterState, setCharacterState] = useState<CharacterState>(
     CharacterState.Idle
   );
-  const mediaRecorder = useRef<MediaRecorder | null>(null);
-  const recordedChunks = useRef<Blob[]>([]);
+  const [noMoreTalk, setMoreTalk] = useState(false)
   const onSpeechFoundCallback = useRef<SpeechFoundCallback>((text) => {});
-  const audioContext = useRef<AudioContext | null>(null);
-  const analyser = useRef<AnalyserNode | null>(null);
-  let stream = useRef<MediaStream | null>(null);
-  const source = useRef<MediaStreamAudioSourceNode | null>(null);
   const bars = useRef<(HTMLDivElement | null)[]>([]);
   
 
@@ -47,8 +41,6 @@ const useSpeechRecognition = () => {
     apiKey: process.env.REACT_APP_OPENAI_API_KEY,
         
   })
-  const previousTranscriptRef = useRef(transcript);
-
 
   useEffect(() => {
     if(speaking){
@@ -59,17 +51,14 @@ const useSpeechRecognition = () => {
 
   useEffect(() => {
     if(conversationStarted && !speaking){
-      alert(1)
       stopRecording() 
     }
   },[conversationStarted, speaking])
 
-  
 
   const setOnSpeechFoundCallback = (callback: SpeechFoundCallback) => {
     onSpeechFoundCallback.current = callback;
   };
-
 
 
   useEffect(() => {
@@ -81,20 +70,21 @@ const useSpeechRecognition = () => {
 
 
   useEffect(() => {
-    if (transcript !== previousTranscriptRef.current) {
-        onSpeechFoundCallback.current(transcript.text);
-        previousTranscriptRef.current = transcript;
+    if(noMoreTalk){
+      setCharacterState(CharacterState.Idle);
+      stopRecording();
     }
-    
-}, [characterState, transcript]);
+
+  },[noMoreTalk])
 
 
   const onMicButtonPressed = async() => {
     if (characterState === CharacterState.Idle) {
-      startRecording();
+      startRecording()
       setCharacterState(CharacterState.Listening);
+      setMoreTalk(false)
     } else if (characterState === CharacterState.Listening) {
-      setCharacterState(CharacterState.Idle);
+      setMoreTalk(true)
     }
   };
 
